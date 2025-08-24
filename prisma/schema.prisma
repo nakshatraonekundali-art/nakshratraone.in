@@ -31,6 +31,7 @@ model User {
   birthCountry String
   birthCity    String
   email        String?    @unique
+  mobile       String?
   userPlans    UserPlan[] // relation to UserPlan
 }
 

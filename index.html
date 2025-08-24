@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Horoscope Chart API</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Horoscope Chart API Test</h1>
+  <button id="getChart">Get Chart</button>
+  <div id="chartContainer"></div>
+
+  <script>
+    var api = 'horo_chart_image/north'; // Replace :chartId with 'north' or 'south'
+    var userId = '643935';
+    var apiKey = '4b732fc899769224cf5b115c861e652b91f7d6a2';
+    var language = 'hi';
+
+    var data = {
+      day: 6,
+      month: 1,
+      year: 2000,
+      hour: 7,
+      min: 45,
+      lat: 19.132,
+      lon: 72.342,
+      tzone: 5.5
+    };
+
+    var auth = "Basic " + btoa(userId + ":" + apiKey);
+
+    $("#getChart").click(function() {
+      $.ajax({
+        url: "https://json.astrologyapi.com/v1/" + api,
+        method: "POST",
+        dataType: "json",
+        headers: {
+          "authorization": auth,
+          "Content-Type": "application/json",
+          "Accept-Language": language
+        },
+        data: JSON.stringify(data)
+      }).then(function(resp) {
+        console.log(resp);
+
+        // Render the SVG directly into HTML
+        if (resp.svg) {
+          $("#chartContainer").html(resp.svg);
+        } else {
+          $("#chartContainer").text("No SVG found in response.");
+        }
+      }).catch(function(err) {
+        console.error(err);
+        $("#chartContainer").text("Error: " + JSON.stringify(err, null, 2));
+      });
+    });
+  </script>
+</body>
+</html>

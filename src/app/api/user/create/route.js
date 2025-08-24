@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, gender, birthDate, birthTime, birthCountry, birthCity, email } = body;
+    const { name, gender, birthDate, birthTime, birthCountry, birthCity, email, mobile } = body;
 
     // Validation
-    if (!name || !gender || !birthDate || !birthTime || !birthCountry || !birthCity) {
+    if (!name || !gender || !birthDate || !birthTime || !birthCountry || !birthCity || !mobile) {
       return new Response(JSON.stringify({ message: "All required fields must be provided" }), { status: 400 });
     }
 
@@ -22,6 +22,7 @@ export async function POST(req) {
         birthCountry,
         birthCity,
         email: email || null,
+        mobile,
       },
     });
 

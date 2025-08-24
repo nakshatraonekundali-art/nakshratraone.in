@@ -1,0 +1,528 @@
+'use client'
+import Link from 'next/link';
+import React, { useState, useEffect, useRef } from 'react';
+
+const BirthPlace = () => {
+  const [country, setCountry] = useState('India');
+  const [city, setCity] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef(null);
+
+  // Sample Indian cities data for demonstration
+  const indianCities = [
+    'Delhi, Delhi, India',
+    'New Delhi, Delhi, India', 
+    'Mumbai, Maharashtra, India',
+    'Bangalore, Karnataka, India',
+    'Chennai, Tamil Nadu, India',
+    'Hyderabad, Telangana, India',
+    'Kolkata, West Bengal, India',
+    'Pune, Maharashtra, India',
+    'Ahmedabad, Gujarat, India',
+    'Jaipur, Rajasthan, India',
+    'Surat, Gujarat, India',
+    'Lucknow, Uttar Pradesh, India',
+    'Kanpur, Uttar Pradesh, India',
+    'Nagpur, Maharashtra, India',
+    'Indore, Madhya Pradesh, India',
+    'Thane, Maharashtra, India',
+    'Bhopal, Madhya Pradesh, India',
+    'Visakhapatnam, Andhra Pradesh, India',
+    'Pimpri-Chinchwad, Maharashtra, India',
+    'Patna, Bihar, India',
+    'Vadodara, Gujarat, India',
+    'Ghaziabad, Uttar Pradesh, India',
+    'Ludhiana, Punjab, India',
+    'Agra, Uttar Pradesh, India',
+    'Nashik, Maharashtra, India',
+    'Faridabad, Haryana, India',
+    'Meerut, Uttar Pradesh, India',
+    'Rajkot, Gujarat, India',
+    'Kalyan-Dombivali, Maharashtra, India',
+    'Vasai-Virar, Maharashtra, India',
+    'Varanasi, Uttar Pradesh, India',
+    'Srinagar, Jammu and Kashmir, India',
+    'Aurangabad, Maharashtra, India',
+    'Dhanbad, Jharkhand, India',
+    'Amritsar, Punjab, India',
+    'Navi Mumbai, Maharashtra, India',
+    'Allahabad, Uttar Pradesh, India',
+    'Ranchi, Jharkhand, India',
+    'Howrah, West Bengal, India',
+    'Coimbatore, Tamil Nadu, India',
+    'Jabalpur, Madhya Pradesh, India',
+    'Gwalior, Madhya Pradesh, India',
+    'Vijayawada, Andhra Pradesh, India',
+    'Jodhpur, Rajasthan, India',
+    'Madurai, Tamil Nadu, India',
+    'Raipur, Chhattisgarh, India',
+    'Kota, Rajasthan, India',
+    'Guwahati, Assam, India',
+    'Chandigarh, Chandigarh, India',
+    'Solapur, Maharashtra, India',
+    'Hubli-Dharwad, Karnataka, India',
+    'Bareilly, Uttar Pradesh, India',
+    'Moradabad, Uttar Pradesh, India',
+    'Mysore, Karnataka, India',
+    'Gurgaon, Haryana, India',
+    'Aligarh, Uttar Pradesh, India',
+    'Jalandhar, Punjab, India',
+    'Tiruchirappalli, Tamil Nadu, India',
+    'Bhubaneswar, Odisha, India',
+    'Salem, Tamil Nadu, India',
+    'Mira-Bhayandar, Maharashtra, India',
+    'Warangal, Telangana, India',
+    'Jalgaon, Maharashtra, India',
+    'Guntur, Andhra Pradesh, India',
+    'Bhiwandi, Maharashtra, India',
+    'Saharanpur, Uttar Pradesh, India',
+    'Gorakhpur, Uttar Pradesh, India',
+    'Bikaner, Rajasthan, India',
+    'Amravati, Maharashtra, India',
+    'Noida, Uttar Pradesh, India',
+    'Jamshedpur, Jharkhand, India',
+    'Bhilai, Chhattisgarh, India',
+    'Cuttack, Odisha, India',
+    'Firozabad, Uttar Pradesh, India',
+    'Kochi, Kerala, India',
+    'Nellore, Andhra Pradesh, India',
+    'Bhavnagar, Gujarat, India',
+    'Dehradun, Uttarakhand, India',
+    'Durgapur, West Bengal, India',
+    'Asansol, West Bengal, India',
+    'Rourkela, Odisha, India',
+    'Nanded, Maharashtra, India',
+    'Kolhapur, Maharashtra, India',
+    'Ajmer, Rajasthan, India',
+    'Akola, Maharashtra, India',
+    'Gulbarga, Karnataka, India',
+    'Jamnagar, Gujarat, India',
+    'Ujjain, Madhya Pradesh, India',
+    'Loni, Uttar Pradesh, India',
+    'Siliguri, West Bengal, India',
+    'Jhansi, Uttar Pradesh, India',
+    'Ulhasnagar, Maharashtra, India',
+    'Jammu, Jammu and Kashmir, India',
+    'Sangli-Miraj & Kupwad, Maharashtra, India',
+    'Mangalore, Karnataka, India',
+    'Erode, Tamil Nadu, India',
+    'Belgaum, Karnataka, India',
+    'Ambattur, Tamil Nadu, India',
+    'Tirunelveli, Tamil Nadu, India',
+    'Malegaon, Maharashtra, India',
+    'Gaya, Bihar, India',
+    'Jalgaon, Maharashtra, India',
+    'Udaipur, Rajasthan, India',
+    'Maheshtala, West Bengal, India',
+    'Davanagere, Karnataka, India',
+    'Kozhikode, Kerala, India',
+    'Kurnool, Andhra Pradesh, India',
+    'Rajpur Sonarpur, West Bengal, India',
+    'Rajahmundry, Andhra Pradesh, India',
+    'Bokaro, Jharkhand, India',
+    'South Dumdum, West Bengal, India',
+    'Bellary, Karnataka, India',
+    'Patiala, Punjab, India',
+    'Gopalpur, Odisha, India',
+    'Agartala, Tripura, India',
+    'Bhagalpur, Bihar, India',
+    'Muzaffarnagar, Uttar Pradesh, India',
+    'Bhatpara, West Bengal, India',
+    'Panihati, West Bengal, India',
+    'Latur, Maharashtra, India',
+    'Dhule, Maharashtra, India',
+    'Rohtak, Haryana, India',
+    'Korba, Chhattisgarh, India',
+    'Bhilwara, Rajasthan, India',
+    'Berhampur, Odisha, India',
+    'Muzaffarpur, Bihar, India',
+    'Ahmednagar, Maharashtra, India',
+    'Mathura, Uttar Pradesh, India',
+    'Kollam, Kerala, India',
+    'Avadi, Tamil Nadu, India',
+    'Kadapa, Andhra Pradesh, India',
+    'Kamarhati, West Bengal, India',
+    'Sambalpur, Odisha, India',
+    'Bilaspur, Chhattisgarh, India',
+    'Shahjahanpur, Uttar Pradesh, India',
+    'Satara, Maharashtra, India',
+    'Bijapur, Karnataka, India',
+    'Rampur, Uttar Pradesh, India',
+    'Shivamogga, Karnataka, India',
+    'Chandrapur, Maharashtra, India',
+    'Junagadh, Gujarat, India',
+    'Thrissur, Kerala, India',
+    'Alwar, Rajasthan, India',
+    'Bardhaman, West Bengal, India',
+    'Kulti, West Bengal, India',
+    'Kakinada, Andhra Pradesh, India',
+    'Nizamabad, Telangana, India',
+    'Parbhani, Maharashtra, India',
+    'Tumkur, Karnataka, India',
+    'Khammam, Telangana, India',
+    'Ozhukarai, Puducherry, India',
+    'Bihar Sharif, Bihar, India',
+    'Panipat, Haryana, India',
+    'Darbhanga, Bihar, India',
+    'Bally, West Bengal, India',
+    'Aizawl, Mizoram, India',
+    'Dewas, Madhya Pradesh, India',
+    'Ichalkaranji, Maharashtra, India',
+    'Karnal, Haryana, India',
+    'Bathinda, Punjab, India',
+    'Jalna, Maharashtra, India',
+    'Eluru, Andhra Pradesh, India',
+    'Kirari Suleman Nagar, Delhi, India',
+    'Barabanki, Uttar Pradesh, India',
+    'Purnia, Bihar, India',
+    'Satna, Madhya Pradesh, India',
+    'Mau, Uttar Pradesh, India',
+    'Sonipat, Haryana, India',
+    'Farrukhabad, Uttar Pradesh, India',
+    'Sagar, Madhya Pradesh, India',
+    'Rourkela, Odisha, India',
+    'Durg, Chhattisgarh, India',
+    'Imphal, Manipur, India',
+    'Ratlam, Madhya Pradesh, India',
+    'Hapur, Uttar Pradesh, India',
+    'Arrah, Bihar, India',
+    'Karimnagar, Telangana, India',
+    'Anantapur, Andhra Pradesh, India',
+    'Etawah, Uttar Pradesh, India',
+    'Ambernath, Maharashtra, India',
+    'North Dumdum, West Bengal, India',
+    'Bharatpur, Rajasthan, India',
+    'Begusarai, Bihar, India',
+    'New Delhi, Delhi, India',
+    'Gandhidham, Gujarat, India',
+    'Baranagar, West Bengal, India',
+    'Tiruvottiyur, Tamil Nadu, India',
+    'Pondicherry, Puducherry, India',
+    'Sikar, Rajasthan, India',
+    'Thoothukudi, Tamil Nadu, India',
+    'Rewa, Madhya Pradesh, India',
+    'Mirzapur, Uttar Pradesh, India',
+    'Raichur, Karnataka, India',
+    'Pali, Rajasthan, India',
+    'Ramagundam, Telangana, India',
+    'Haridwar, Uttarakhand, India',
+    'Vijayanagaram, Andhra Pradesh, India',
+    'Katihar, Bihar, India',
+    'Nagarcoil, Tamil Nadu, India',
+    'Sri Ganganagar, Rajasthan, India',
+    'Karawal Nagar, Delhi, India',
+    'Mango, Jharkhand, India',
+    'Thanjavur, Tamil Nadu, India',
+    'Bulandshahr, Uttar Pradesh, India',
+    'Uluberia, West Bengal, India',
+    'Murwara, Madhya Pradesh, India',
+    'Sambhal, Uttar Pradesh, India',
+    'Singrauli, Madhya Pradesh, India',
+    'Nadiad, Gujarat, India',
+    'Secunderabad, Telangana, India',
+    'Naihati, West Bengal, India',
+    'Yamunanagar, Haryana, India',
+    'Bidhan Nagar, West Bengal, India',
+    'Pallavaram, Tamil Nadu, India',
+    'Bidar, Karnataka, India',
+    'Munger, Bihar, India',
+    'Panchkula, Haryana, India',
+    'Burhanpur, Madhya Pradesh, India',
+    'Raurkela Industrial Township, Odisha, India',
+    'Kharagpur, West Bengal, India',
+    'Dindigul, Tamil Nadu, India',
+    'Gandhinagar, Gujarat, India',
+    'Hospet, Karnataka, India',
+    'Nangloi Jat, Delhi, India',
+    'Malda, West Bengal, India',
+    'Ongole, Andhra Pradesh, India',
+    'Deoghar, Jharkhand, India',
+    'Chapra, Bihar, India',
+    'Haldia, West Bengal, India',
+    'Khandwa, Madhya Pradesh, India',
+    'Nandyal, Andhra Pradesh, India',
+    'Morena, Madhya Pradesh, India',
+    'Amroha, Uttar Pradesh, India',
+    'Mahbubnagar, Telangana, India',
+    'Saharsa, Bihar, India',
+    'Kamareddy, Telangana, India',
+    'Sambalpur, Odisha, India',
+    'Azamgarh, Uttar Pradesh, India',
+    'Chhapra, Bihar, India',
+    'Kurnool, Andhra Pradesh, India',
+    'Nizamabad, Telangana, India',
+    'Orai, Uttar Pradesh, India',
+    'Calicut, Kerala, India',
+    'Xianyang, Shaanxi, China',
+    'Karur, Tamil Nadu, India',
+    'Udupi, Karnataka, India',
+    'Ballia, Uttar Pradesh, India',
+    'Pilibhit, Uttar Pradesh, India',
+    'Cottonpet, Karnataka, India',
+    'Hansi, Haryana, India',
+    'Pratapgarh, Uttar Pradesh, India',
+    'Sirsa, Haryana, India',
+    'Kasganj, Uttar Pradesh, India',
+    'Kishanganj, Bihar, India',
+    'Jamalpur, Bihar, India',
+    'Balasore, Odisha, India',
+    'Jaunpur, Uttar Pradesh, India',
+    'Jalna, Maharashtra, India',
+    'Neyveli, Tamil Nadu, India',
+    'Mahoba, Uttar Pradesh, India',
+    'Siswa Bazar, Uttar Pradesh, India',
+    'Malerkotla, Punjab, India'
+  ];
+
+  const searchCities = (query) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const filteredCities = indianCities
+      .filter(cityName => 
+        cityName.toLowerCase().includes(query.toLowerCase())
+      )
+      .slice(0, 10); // Limit to top 10 results
+
+    setSuggestions(filteredCities);
+  };
+
+  const handleCityChange = (value) => {
+    setCity(value);
+    
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      if (value.trim()) {
+        setLoading(true);
+        searchCities(value);
+        setShowSuggestions(true);
+        setLoading(false);
+      } else {
+        setShowSuggestions(false);
+        setSuggestions([]);
+      }
+    }, 300);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setCity(suggestion);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
+
+  const handleCityBlur = () => {
+    // Delay hiding suggestions to allow clicking
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 150);
+  };
+
+  const handleCityFocus = () => {
+    if (city.trim() && suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <>
+    {/* Desktop Version */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 hidden md:flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 min-h-[500px] max-h-[90vh] overflow-y-auto">
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold">
+            <span className="text-orange-500">NAKSHATRA</span>
+            <span className="text-blue-500">one</span>
+          </h1>
+        </div>
+
+        {/* Main Heading */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 leading-tight">
+            What's Your Birthplace?
+          </h2>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-6">
+          {/* Country and City Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
+              >
+                <option value="India">India</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+              </select>
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Type Birth City/District"
+                value={city}
+                onChange={(e) => handleCityChange(e.target.value)}
+                onFocus={handleCityFocus}
+                onBlur={handleCityBlur}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSuggestionClick(suggestion);
+                      }}
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                    >
+                      <span className="text-gray-700">{suggestion}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {loading && (
+                <div className="absolute right-3 top-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500"></div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center pt-32">
+            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
+              <Link href={"/shubham/overreview"}>View Your Kundli Now!</Link>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Mobile Version - Full Screen White */}
+    <div className="md:hidden min-h-screen bg-white p-4 overflow-y-auto">
+      <div className="max-w-md mx-auto">
+        {/* Logo */}
+        <div className="text-center mb-6 mt-4">
+          <h1 className="text-2xl font-bold">
+            <span className="text-orange-500">NAKSHATRA</span>
+            <span className="text-blue-500">one</span>
+          </h1>
+        </div>
+
+        {/* Main Heading */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 leading-tight">
+            What's Your Birthplace?
+          </h2>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-6">
+          {/* Country and City Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
+              >
+                <option value="India">India</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+              </select>
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Type Birth City/District"
+                value={city}
+                onChange={(e) => handleCityChange(e.target.value)}
+                onFocus={handleCityFocus}
+                onBlur={handleCityBlur}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSuggestionClick(suggestion);
+                      }}
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                    >
+                      <span className="text-gray-700">{suggestion}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {loading && (
+                <div className="absolute right-3 top-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500"></div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center pt-32 pb-6">
+            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
+              View Your Kundli Now!
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </>
+  );
+};
+
+export default BirthPlace;
