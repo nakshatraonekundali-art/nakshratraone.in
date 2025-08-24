@@ -1,10 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useKundli } from '../context/KundliContext';
+import Navigation from '../components/Navigation';
 
 const PanchangDetails = () => {
   const [panchangData, setPanchangData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { language } = useKundli();
 
   // API configuration
   const API_CONFIG = {
@@ -14,7 +17,33 @@ const PanchangDetails = () => {
     api: 'advanced_panchang'
   };
 
-  let language = 'hi'; // Set to English
+  // Translations
+  const translations = {
+    loading: {
+      english: "Loading Today's Panchang...",
+      hindi: "आज का पंचांग लोड हो रहा है..."
+    },
+    error: {
+      english: "Error Loading Data",
+      hindi: "डेटा लोड करने में त्रुटि"
+    },
+    retry: {
+      english: "Retry",
+      hindi: "पुनः प्रयास करें"
+    },
+    title: {
+      english: "Today's Vedic Calendar - Panchang",
+      hindi: "आज का वैदिक कैलेंडर - पंचांग"
+    },
+    next: {
+      english: "Next →",
+      hindi: "अगला →"
+    },
+    back: {
+      english: "Back",
+      hindi: "वापस"
+    }
+  };
    
   // Birth details
   const birthDetails = {
@@ -73,12 +102,12 @@ const PanchangDetails = () => {
 
   // Function to handle next button click
   const handleNext = () => {
-    console.log('Navigate to next section');
+    window.location.href = "/shubham/rashi";
   };
 
   // Function to handle back button click
   const handleBack = () => {
-    console.log('Navigate back');
+    window.location.href = "/shubham/manglikdosh";
   };
 
   // Function to format time
@@ -106,7 +135,9 @@ const PanchangDetails = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">Loading Today's Panchang...</p>
+          <p className="text-center mt-4 text-gray-600">
+            {language === 'english' ? translations.loading.english : translations.loading.hindi}
+          </p>
         </div>
       </div>
     );
@@ -118,13 +149,15 @@ const PanchangDetails = () => {
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="text-red-600 text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+            <h2 className="text-xl font-bold mb-2">
+              {language === 'english' ? translations.error.english : translations.error.hindi}
+            </h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
             <button 
               onClick={fetchPanchangData} 
               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
             >
-              Retry
+              {language === 'english' ? translations.retry.english : translations.retry.hindi}
             </button>
           </div>
         </div>
@@ -152,7 +185,7 @@ const PanchangDetails = () => {
                 {/* Main Title */}
                 <div className="text-center mb-6">
                   <h1 className="text-xl font-bold text-gray-800 mb-2 leading-tight md:text-lg">
-                    Today's Vedic Calendar - Panchang
+                    {language === 'english' ? translations.title.english : translations.title.hindi}
                   </h1>
                   <p className="text-sm text-gray-600">
                     {panchangData.day}, {birthDetails.day}/{birthDetails.month}/{birthDetails.year}
@@ -451,23 +484,13 @@ const PanchangDetails = () => {
           </div>
 
           {/* Navigation - Fixed at bottom */}
-          <div className="flex justify-between items-center p-6 bg-white bg-opacity-90 border-t border-gray-200 flex-shrink-0">
-            <button 
-              onClick={handleBack}
-              className="p-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-100 transition-all"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button 
-              onClick={handleNext}
-              className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
-            >
-              Next →
-            </button>
-          </div>
+          <Navigation 
+            currentPage="panchang" 
+            nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+            backText={language === 'english' ? translations.back.english : translations.back.hindi}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
         </div>
       </div>
     </div>

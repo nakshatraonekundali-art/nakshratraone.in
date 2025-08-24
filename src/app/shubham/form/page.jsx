@@ -1,23 +1,41 @@
 'use client'
-import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
+import { useKundli } from '../context/KundliContext';
+import Navigation from '../components/Navigation';
 
 const Form = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    gender: 'Male',
-    month: 'MM',
-    day: 'DD',
-    year: 'YYYY',
-    hour: 'HH',
-    minute: 'MM'
-  });
+  const { formData, updateFormData, language } = useKundli();
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    updateFormData({ [field]: value });
+  };
+  
+  // Translations
+  const translations = {
+    title: {
+      english: "Enter Your Birth Details To Get Your Free Kundli Analysis",
+      hindi: "अपना मुफ्त कुंडली विश्लेषण प्राप्त करने के लिए अपना जन्म विवरण दर्ज करें"
+    },
+    name: {
+      english: "Your Name",
+      hindi: "आपका नाम"
+    },
+    dateOfBirth: {
+      english: "Date of Birth:",
+      hindi: "जन्म तिथि:"
+    },
+    timeOfBirth: {
+      english: "Time of Birth:",
+      hindi: "जन्म समय:"
+    },
+    next: {
+      english: "Next",
+      hindi: "अगला"
+    },
+    back: {
+      english: "Back",
+      hindi: "पीछे"
+    }
   };
 
   const months = [
@@ -46,8 +64,8 @@ const Form = () => {
         {/* Main Heading */}
         <div className="text-center mb-8">
           <h2 className="text-xl font-bold text-gray-800 leading-tight">
-            Enter Your Birth Details To Get Your{' '}
-            <span className="text-orange-500 underline">Free Kundli Analysis</span>
+            {language === 'english' ? translations.title.english : translations.title.hindi}{' '}
+            <span className="text-orange-500 underline">{language === 'english' ? 'Free Kundli Analysis' : 'मुफ्त कुंडली विश्लेषण'}</span>
           </h2>
         </div>
 
@@ -58,7 +76,7 @@ const Form = () => {
             <div>
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={language === 'english' ? translations.name.english : translations.name.hindi}
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
@@ -79,7 +97,7 @@ const Form = () => {
 
           {/* Date of Birth */}
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Date of Birth:</label>
+            <label className="block text-gray-700 font-medium mb-3">{language === 'english' ? translations.dateOfBirth.english : translations.dateOfBirth.hindi}</label>
             <div className="grid grid-cols-3 gap-4">
               <select
                 value={formData.month}
@@ -113,7 +131,7 @@ const Form = () => {
 
           {/* Time of Birth */}
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Time of Birth:</label>
+            <label className="block text-gray-700 font-medium mb-3">{language === 'english' ? translations.timeOfBirth.english : translations.timeOfBirth.hindi}</label>
             <div className="grid grid-cols-2 gap-4">
               <select
                 value={formData.hour}
@@ -136,20 +154,15 @@ const Form = () => {
             </div>
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between items-center pt-6">
-            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-8 rounded-lg transition-colors flex items-center gap-2">
-              <Link href={"/shubham/form/birthplace"}>Next</Link>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+          {/* Navigation */}
+          <div className="pt-6">
+            <Navigation 
+              currentPage="form"
+              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              backText={language === 'english' ? translations.back.english : translations.back.hindi}
+              onNext={() => window.location.href = '/shubham/form/birthplace'}
+              onBack={() => window.location.href = '/shubham'}
+            />
           </div>
         </div>
       </div>
@@ -169,8 +182,8 @@ const Form = () => {
         {/* Main Heading */}
         <div className="text-center mb-8">
           <h2 className="text-xl font-bold text-gray-800 leading-tight">
-            Enter Your Birth Details To Get Your{' '}
-            <span className="text-orange-500 underline">Free Kundli Analysis</span>
+            {language === 'english' ? translations.title.english : translations.title.hindi}{' '}
+            <span className="text-orange-500 underline">{language === 'english' ? 'Free Kundli Analysis' : 'मुफ्त कुंडली विश्लेषण'}</span>
           </h2>
         </div>
 
@@ -181,7 +194,7 @@ const Form = () => {
             <div>
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={language === 'english' ? translations.name.english : translations.name.hindi}
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
@@ -202,7 +215,7 @@ const Form = () => {
 
           {/* Date of Birth */}
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Date of Birth:</label>
+            <label className="block text-gray-700 font-medium mb-3">{language === 'english' ? translations.dateOfBirth.english : translations.dateOfBirth.hindi}</label>
             <div className="grid grid-cols-3 gap-4">
               <select
                 value={formData.month}
@@ -236,7 +249,7 @@ const Form = () => {
 
           {/* Time of Birth */}
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Time of Birth:</label>
+            <label className="block text-gray-700 font-medium mb-3">{language === 'english' ? translations.timeOfBirth.english : translations.timeOfBirth.hindi}</label>
             <div className="grid grid-cols-2 gap-4">
               <select
                 value={formData.hour}
@@ -259,20 +272,15 @@ const Form = () => {
             </div>
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between items-center pt-6 pb-6">
-            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-8 rounded-lg transition-colors flex items-center gap-2">
-              Next
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+          {/* Navigation */}
+          <div className="pt-6 pb-6">
+            <Navigation 
+              currentPage="form"
+              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              backText={language === 'english' ? translations.back.english : translations.back.hindi}
+              onNext={() => window.location.href = '/shubham/form/birthplace'}
+              onBack={() => window.location.href = '/shubham'}
+            />
           </div>
         </div>
       </div>

@@ -1,7 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useKundli } from '../context/KundliContext';
+import Link from 'next/link';
+import Navigation from '../components/Navigation';
 
 const KundliChart = () => {
+  const { formData, language, getBirthDetails } = useKundli();
   const [planetData, setPlanetData] = useState([]);
   const [chartImage, setChartImage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,18 +18,40 @@ const KundliChart = () => {
     apiKey: '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf',
     baseUrl: 'https://json.astrologyapi.com/v1',
   };
-  const language = 'en'; // Change to 'hi' for Hindi
-
-  // Birth details
-  const birthDetails = {
-    day: 15,
-    month: 3,
-    year: 1995,
-    hour: 14,
-    min: 30,
-    lat: 28.6139,
-    lon: 77.2090,
-    tzone: 5.5,
+  
+  // Get birth details from context
+  const birthDetails = getBirthDetails();
+  
+  // Translations
+  const translations = {
+    loading: {
+      english: "Loading Kundli Chart...",
+      hindi: "कुंडली चार्ट लोड हो रहा है..."
+    },
+    error: {
+      english: "Error Loading Data",
+      hindi: "डेटा लोड करने में त्रुटि"
+    },
+    retry: {
+      english: "Retry",
+      hindi: "पुनः प्रयास करें"
+    },
+    title: {
+      english: "Here's your kundli chart",
+      hindi: "यहां आपका कुंडली चार्ट है"
+    },
+    chartLoading: {
+      english: "Chart Loading...",
+      hindi: "चार्ट लोड हो रहा है..."
+    },
+    next: {
+      english: "Next →",
+      hindi: "अगला →"
+    },
+    back: {
+      english: "Back",
+      hindi: "वापस"
+    }
   };
 
   // Function to get Basic Auth header
@@ -43,7 +69,7 @@ const KundliChart = () => {
           Authorization: getAuthHeader(),
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          'Accept-Language': language,
+          'Accept-Language': language === 'english' ? 'en' : 'hi',
         },
         body: JSON.stringify(birthDetails),
       });
@@ -69,7 +95,7 @@ const KundliChart = () => {
           Authorization: getAuthHeader(),
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          'Accept-Language': language,
+          'Accept-Language': language === 'english' ? 'en' : 'hi',
         },
         body: JSON.stringify(birthDetails),
       });
@@ -181,9 +207,21 @@ const KundliChart = () => {
     return icons[planetName] || '●';
   };
 
-  // Navigation handlers (kept for parity with Venus card)
-  const handleNext = () => setCurrentView((v) => (v === 'chart' ? 'planets' : 'chart'));
-  const handleBack = () => setCurrentView('chart');
+  // Navigation handlers
+  const handleNext = () => {
+    if (currentView === 'chart') {
+      setCurrentView('planets');
+    } else {
+      window.location.href = '/shubham/planets/sun';
+    }
+  };
+  const handleBack = () => {
+    if (currentView !== 'chart') {
+      setCurrentView('chart');
+    } else {
+      window.location.href = '/shubham/overreview';
+    }
+  };
 
   // Loading UI — matched style
   if (loading) {
@@ -191,7 +229,7 @@ const KundliChart = () => {
       <div className="min-h-screen bg-white md:bg-gradient-to-br md:from-purple-800 md:via-purple-600 md:to-purple-400 md:flex md:items-center md:justify-center md:p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">Loading Kundli Chart...</p>
+          <p className="text-center mt-4 text-gray-600">{language === 'english' ? translations.loading.english : translations.loading.hindi}</p>
         </div>
       </div>
     );
@@ -204,7 +242,7 @@ const KundliChart = () => {
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="text-red-600 text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+            <h2 className="text-xl font-bold mb-2">{language === 'english' ? translations.error.english : translations.error.hindi}</h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => {
@@ -214,7 +252,7 @@ const KundliChart = () => {
               }}
               className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
             >
-              Retry
+              {language === 'english' ? translations.retry.english : translations.retry.hindi}
             </button>
           </div>
         </div>
@@ -234,7 +272,7 @@ const KundliChart = () => {
               <div className="text-orange-500 text-xl font-bold md:text-lg">Nakshatra</div>
               <div className="text-blue-500 text-xl font-bold md:text-lg">One</div>
             </div>
-            <h2 className="text-lg font-bold text-gray-800">Here's your kundli chart</h2>
+            <h2 className="text-lg font-bold text-gray-800">{language === 'english' ? translations.title.english : translations.title.hindi}</h2>
           </div>
 
           {/* Scrollable content area — flex-1 with overflow (exactly like Venus) */}
@@ -252,7 +290,7 @@ const KundliChart = () => {
                     <div className="w-full h-80 md:h-72 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
                       <div className="text-center">
                         <div className="text-4xl mb-2">📊</div>
-                        <p className="text-gray-600 text-sm">Chart Loading...</p>
+                        <p className="text-gray-600 text-sm">{language === 'english' ? translations.chartLoading.english : translations.chartLoading.hindi}</p>
                       </div>
                     </div>
                   )}
@@ -311,25 +349,14 @@ const KundliChart = () => {
           </div>
 
           {/* Navigation — fixed within card just like Venus */}
-          <div className="flex justify-between items-center p-6 bg-white bg-opacity-90 border-t border-gray-200 flex-shrink-0">
-            <button
-              onClick={handleBack}
-              className="p-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-100 transition-all"
-              disabled={currentView === 'chart'}
-              aria-disabled={currentView === 'chart'}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
-            >
-              Next →
-            </button>
-          </div>
+          <Navigation 
+            currentPage="planets" 
+            nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+            backText={language === 'english' ? translations.back.english : translations.back.hindi}
+            onNext={handleNext}
+            onBack={handleBack}
+            disableBack={currentView === 'chart'}
+          />
         </div>
       </div>
     </div>

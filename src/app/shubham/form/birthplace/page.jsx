@@ -1,14 +1,40 @@
 'use client'
-import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
+import { useKundli } from '../../context/KundliContext';
+import Navigation from '../../components/Navigation';
 
 const BirthPlace = () => {
-  const [country, setCountry] = useState('India');
-  const [city, setCity] = useState('');
+  const { formData, updateFormData, language } = useKundli();
+  const [country, setCountry] = useState(formData.country || 'India');
+  const [city, setCity] = useState(formData.city || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef(null);
+  
+  // Translations
+  const translations = {
+    title: {
+      english: "What's Your Birthplace?",
+      hindi: "आपका जन्म स्थान क्या है?"
+    },
+    placeholder: {
+      english: "Type Birth City/District",
+      hindi: "जन्म शहर/जिला टाइप करें"
+    },
+    viewKundli: {
+      english: "View Your Kundli Now!",
+      hindi: "अपनी कुंडली अभी देखें!"
+    },
+    next: {
+      english: "View Your Kundli Now!",
+      hindi: "अपनी कुंडली अभी देखें!"
+    },
+    back: {
+      english: "Back",
+      hindi: "वापस"
+    }
+  };
 
   // Sample Indian cities data for demonstration
   const indianCities = [
@@ -293,6 +319,7 @@ const BirthPlace = () => {
 
   const handleCityChange = (value) => {
     setCity(value);
+    updateFormData({ city: value });
     
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -313,6 +340,7 @@ const BirthPlace = () => {
 
   const handleSuggestionClick = (suggestion) => {
     setCity(suggestion);
+    updateFormData({ city: suggestion });
     setShowSuggestions(false);
     setSuggestions([]);
   };
@@ -321,6 +349,8 @@ const BirthPlace = () => {
     // Delay hiding suggestions to allow clicking
     setTimeout(() => {
       setShowSuggestions(false);
+      // Update formData when focus is lost
+      updateFormData({ country, city });
     }, 150);
   };
 
@@ -354,7 +384,7 @@ const BirthPlace = () => {
         {/* Main Heading */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 leading-tight">
-            What's Your Birthplace?
+            {language === 'english' ? translations.title.english : translations.title.hindi}
           </h2>
         </div>
 
@@ -365,7 +395,10 @@ const BirthPlace = () => {
             <div>
               <select
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                onChange={(e) => {
+                  setCountry(e.target.value);
+                  updateFormData({ country: e.target.value });
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
               >
                 <option value="India">India</option>
@@ -378,7 +411,7 @@ const BirthPlace = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Type Birth City/District"
+                placeholder={language === 'english' ? translations.placeholder.english : translations.placeholder.hindi}
                 value={city}
                 onChange={(e) => handleCityChange(e.target.value)}
                 onFocus={handleCityFocus}
@@ -413,19 +446,14 @@ const BirthPlace = () => {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between items-center pt-32">
-            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
-              <Link href={"/shubham/overreview"}>View Your Kundli Now!</Link>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+          <div className="pt-32">
+            <Navigation 
+              currentPage="birthplace" 
+              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              backText={language === 'english' ? translations.back.english : translations.back.hindi}
+              onNext={() => window.location.href = "/shubham/overreview"}
+              onBack={() => window.location.href = "/shubham/form"}
+            />
           </div>
         </div>
       </div>
@@ -445,7 +473,7 @@ const BirthPlace = () => {
         {/* Main Heading */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 leading-tight">
-            What's Your Birthplace?
+            {language === 'english' ? translations.title.english : translations.title.hindi}
           </h2>
         </div>
 
@@ -456,7 +484,10 @@ const BirthPlace = () => {
             <div>
               <select
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                onChange={(e) => {
+                  setCountry(e.target.value);
+                  updateFormData({ country: e.target.value });
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
               >
                 <option value="India">India</option>
@@ -469,7 +500,7 @@ const BirthPlace = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Type Birth City/District"
+                placeholder={language === 'english' ? translations.placeholder.english : translations.placeholder.hindi}
                 value={city}
                 onChange={(e) => handleCityChange(e.target.value)}
                 onFocus={handleCityFocus}
@@ -504,19 +535,14 @@ const BirthPlace = () => {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between items-center pt-32 pb-6">
-            <button className="flex items-center justify-center w-12 h-12 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button className="bg-orange-400 hover:bg-orange-500 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
-              View Your Kundli Now!
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+          <div className="pt-32 pb-6">
+            <Navigation 
+              currentPage="birthplace" 
+              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              backText={language === 'english' ? translations.back.english : translations.back.hindi}
+              onNext={() => window.location.href = "/shubham/overreview"}
+              onBack={() => window.location.href = "/shubham/form"}
+            />
           </div>
         </div>
       </div>

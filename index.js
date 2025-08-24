@@ -1,6 +1,6 @@
 
 
-const api = 'general_rashi_report/sun';
+const api = 'general_house_report/mars';
 const userId = '643886';
 const apiKey = '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf';
 const language = 'eng';

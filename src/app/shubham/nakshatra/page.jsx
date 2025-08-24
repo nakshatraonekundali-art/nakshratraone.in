@@ -1,10 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useKundli } from '../context/KundliContext';
+import Navigation from '../components/Navigation';
 
 const NakshatraPrediction = () => {
   const [nakshatraData, setNakshatraData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { language, getBirthDetails } = useKundli();
 
   // API configuration
   const API_CONFIG = {
@@ -14,18 +17,31 @@ const NakshatraPrediction = () => {
     api: 'daily_nakshatra_prediction'
   };
 
-  let language = 'hi'; // By default it is set to en
-   
-  // Birth details
-  const birthDetails = {
-    day: 6,
-    month: 1,
-    year: 2000,
-    hour: 7,
-    min: 45,
-    lat: 19.132,
-    lon: 72.342,
-    tzone: 5.5
+  // Get birth details from context
+  const birthDetails = getBirthDetails();
+  
+  // Translations
+  const translations = {
+    loading: {
+      english: "Loading Your Nakshatra Prediction...",
+      hindi: "आपकी नक्षत्र भविष्यवाणी लोड हो रही है..."
+    },
+    error: {
+      english: "Error Loading Data",
+      hindi: "डेटा लोड करने में त्रुटि"
+    },
+    retry: {
+      english: "Retry",
+      hindi: "पुनः प्रयास करें"
+    },
+    next: {
+      english: "Next →",
+      hindi: "अगला →"
+    },
+    back: {
+      english: "Back",
+      hindi: "वापस"
+    }
   };
 
   // Function to get Basic Auth header
@@ -44,7 +60,7 @@ const NakshatraPrediction = () => {
           'Authorization': getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language
+          'Accept-Language': language === 'english' ? 'en' : 'hi'
         },
         body: JSON.stringify(birthDetails)
       });
@@ -85,7 +101,7 @@ const NakshatraPrediction = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">Loading Your Nakshatra Prediction...</p>
+          <p className="text-center mt-4 text-gray-600">{language === 'english' ? translations.loading.english : translations.loading.hindi}</p>
         </div>
       </div>
     );
@@ -97,13 +113,13 @@ const NakshatraPrediction = () => {
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="text-red-600 text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+            <h2 className="text-xl font-bold mb-2">{language === 'english' ? translations.error.english : translations.error.hindi}</h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
             <button 
               onClick={fetchNakshatraData} 
               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
             >
-              Retry
+              {language === 'english' ? translations.retry.english : translations.retry.hindi}
             </button>
           </div>
         </div>
@@ -255,23 +271,13 @@ const NakshatraPrediction = () => {
           </div>
 
           {/* Navigation - Fixed at bottom */}
-          <div className="flex justify-between items-center p-6 bg-white bg-opacity-90 border-t border-gray-200 flex-shrink-0">
-            <button 
-              onClick={handleBack}
-              className="p-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-100 transition-all"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button 
-              onClick={handleNext}
-              className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
-            >
-              Next →
-            </button>
-          </div>
+          <Navigation 
+            currentPage="nakshatra" 
+            nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+            backText={language === 'english' ? translations.back.english : translations.back.hindi}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
         </div>
       </div>
     </div>
