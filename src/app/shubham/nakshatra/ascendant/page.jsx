@@ -1,10 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useKundli } from '../../context/KundliContext';
+import Navigation from '../../components/Navigation';
 
 const AscendantReport = () => {
   const [ascendantData, setAscendantData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { language } = useKundli();
 
   // API configuration
   const API_CONFIG = {
@@ -13,19 +16,93 @@ const AscendantReport = () => {
     baseUrl: 'https://json.astrologyapi.com/v1',
     api: 'general_ascendant_report'
   };
-
-  let language = 'hi'; // Set to English
    
   // Birth details
   const birthDetails = {
-    day: 8,
-    month: 2,
-    year: 2000,
+    day: 4,
+    month: 8,
+    year: 2010,
     hour: 7,
     min: 45,
     lat: 19.132,
     lon: 72.342,
     tzone: 5.5
+  };
+
+  // Translations
+  const translations = {
+    loading: {
+      english: "Loading Your Ascendant Report...",
+      hindi: "आपकी लग्न रिपोर्ट लोड हो रही है..."
+    },
+    error: {
+      english: "Error Loading Data",
+      hindi: "डेटा लोड करने में त्रुटि"
+    },
+    retry: {
+      english: "Retry",
+      hindi: "पुनः प्रयास करें"
+    },
+    title: {
+      english: "- The First Impression You Make",
+      hindi: "- आपकी पहली छाप"
+    },
+    risingSignTitle: {
+      english: "Your Rising Sign is",
+      hindi: "आपका उदय राशि है"
+    },
+    whatIsAscendant: {
+      english: "What is Your Rising Sign?",
+      hindi: "आपकी उदय राशि क्या है?"
+    },
+    ascendantDescription: {
+      english: "Your Ascendant (Rising sign) is the zodiac sign that was rising on the eastern horizon at the exact moment of your birth. It represents the mask you wear in public, your first impression on others, and how you approach new situations in life.",
+      hindi: "आपकी लग्न (उदय राशि) वह राशि है जो आपके जन्म के समय पूर्वी क्षितिज पर उदित हो रही थी। यह आपके सार्वजनिक व्यक्तित्व, दूसरों पर आपकी पहली छाप, और जीवन में नई परिस्थितियों का सामना करने के आपके तरीके को दर्शाती है।"
+    },
+    personalityTitle: {
+      english: "Rising Personality",
+      hindi: "उदय व्यक्तित्व"
+    },
+    howWorldSeesYou: {
+      english: "How The World Sees You",
+      hindi: "दुनिया आपको कैसे देखती है"
+    },
+    keyTraits: {
+      english: "Key Rising Traits",
+      hindi: "मुख्य उदय विशेषताएं"
+    },
+    firstImpression: {
+      english: "First Impression",
+      hindi: "पहली छाप"
+    },
+    publicPersona: {
+      english: "Public Persona",
+      hindi: "सार्वजनिक व्यक्तित्व"
+    },
+    lifeApproach: {
+      english: "Life Approach",
+      hindi: "जीवन दृष्टिकोण"
+    },
+    naturalStyle: {
+      english: "Natural Style",
+      hindi: "प्राकृतिक शैली"
+    },
+    embraceTitle: {
+      english: "Embrace Your Rising",
+      hindi: "अपनी लग्न को अपनाएं"
+    },
+    embraceMessage: {
+      english: "Remember, your Rising sign is your cosmic invitation to the world. It's the energy you naturally radiate and the lens through which you experience life. Embrace this aspect of yourself - it's your unique way of making your mark on the world.",
+      hindi: "याद रखें, आपकी उदय राशि दुनिया के लिए आपका ब्रह्मांडीय निमंत्रण है। यह वह ऊर्जा है जो आप स्वाभाविक रूप से विकीर्ण करते हैं और वह दृष्टिकोण है जिससे आप जीवन का अनुभव करते हैं। अपने इस पहलू को अपनाएं - यही दुनिया पर अपनी छाप छोड़ने का आपका अनूठा तरीका है।"
+    },
+    next: {
+      english: "Continue to Gems →",
+      hindi: "रत्न की ओर जारी रखें →"
+    },
+    back: {
+      english: "← Back to Nakshatra",
+      hindi: "← नक्षत्र पर वापस जाएं"
+    }
   };
 
   // Function to get Basic Auth header
@@ -38,13 +115,14 @@ const AscendantReport = () => {
   const fetchAscendantData = async () => {
     try {
       setLoading(true);
+      setError('');
       const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
         method: 'POST',
         headers: {
           'Authorization': getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language
+          'Accept-Language': language === 'english' ? 'en' : 'hi'
         },
         body: JSON.stringify(birthDetails)
       });
@@ -70,16 +148,6 @@ const AscendantReport = () => {
     fetchAscendantData();
   }, []);
 
-  // Function to handle next button click
-  const handleNext = () => {
-    console.log('Navigate to next section');
-  };
-
-  // Function to handle back button click
-  const handleBack = () => {
-    console.log('Navigate back');
-  };
-
   // Function to get zodiac sign emoji
   const getZodiacEmoji = (sign) => {
     const zodiacEmojis = {
@@ -104,7 +172,9 @@ const AscendantReport = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">Loading Your Ascendant Report...</p>
+          <p className="text-center mt-4 text-gray-600">
+            {language === 'english' ? translations.loading.english : translations.loading.hindi}
+          </p>
         </div>
       </div>
     );
@@ -116,13 +186,15 @@ const AscendantReport = () => {
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="text-red-600 text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+            <h2 className="text-xl font-bold mb-2">
+              {language === 'english' ? translations.error.english : translations.error.hindi}
+            </h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
             <button 
               onClick={fetchAscendantData} 
               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
             >
-              Retry
+              {language === 'english' ? translations.retry.english : translations.retry.hindi}
             </button>
           </div>
         </div>
@@ -150,7 +222,7 @@ const AscendantReport = () => {
                 {/* Main Title */}
                 <div className="text-center mb-6">
                   <h1 className="text-xl font-bold text-gray-800 mb-4 leading-tight md:text-lg">
-                    Your Rising Sign is {ascendantData.asc_report.ascendant} - The First Impression You Make
+                    {language === 'english' ? translations.risingSignTitle.english : translations.risingSignTitle.hindi} {ascendantData.asc_report.ascendant} {language === 'english' ? translations.title.english : translations.title.hindi}
                   </h1>
                 </div>
 
@@ -185,13 +257,13 @@ const AscendantReport = () => {
                 <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-300 mb-6">
                   <h3 className="text-lg font-bold text-gray-800 mb-3 md:text-base flex items-center">
                     <span className="text-2xl mr-2">🌅</span>
-                    What is Your Rising Sign?
+                    {language === 'english' ? translations.whatIsAscendant.english : translations.whatIsAscendant.hindi}
                   </h3>
-                  <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                    Your Ascendant (Rising sign) is the zodiac sign that was rising on the eastern horizon 
-                    at the exact moment of your birth. It represents the mask you wear in public, 
-                    your first impression on others, and how you approach new situations in life.
-                  </p>
+                  <div className="bg-white bg-opacity-70 rounded-lg p-4">
+                    <p className="text-base text-gray-700 leading-relaxed md:text-sm">
+                      {language === 'english' ? translations.ascendantDescription.english : translations.ascendantDescription.hindi}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Detailed Report */}
@@ -199,17 +271,19 @@ const AscendantReport = () => {
                   <div className="mb-4">
                     <h3 className="text-lg font-bold text-gray-800 mb-2 md:text-base flex items-center">
                       <span className="text-2xl mr-2">✨</span>
-                      Your {ascendantData.asc_report.ascendant} Rising Personality
+                      {language === 'english' ? `Your ${ascendantData.asc_report.ascendant} ${translations.personalityTitle.english}` : `आपका ${ascendantData.asc_report.ascendant} ${translations.personalityTitle.hindi}`}
                     </h3>
                     <div className="bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold inline-block mb-4">
-                      How The World Sees You
+                      {language === 'english' ? translations.howWorldSeesYou.english : translations.howWorldSeesYou.hindi}
                     </div>
                   </div>
                   
                   <div className="space-y-4">
-                    <p className="text-sm text-gray-700 leading-relaxed md:text-xs">
-                      {ascendantData.asc_report.report}
-                    </p>
+                    <div className="bg-white bg-opacity-70 rounded-lg p-4">
+                      <p className="text-sm text-gray-700 leading-relaxed md:text-xs">
+                        {ascendantData.asc_report.report}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -217,25 +291,33 @@ const AscendantReport = () => {
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-300 mb-6">
                   <h3 className="text-lg font-bold text-gray-800 mb-3 md:text-base flex items-center">
                     <span className="text-2xl mr-2">🎭</span>
-                    Key {ascendantData.asc_report.ascendant} Rising Traits
+                    {language === 'english' ? `Key ${ascendantData.asc_report.ascendant} ${translations.keyTraits.english}` : `मुख्य ${ascendantData.asc_report.ascendant} ${translations.keyTraits.hindi}`}
                   </h3>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 text-center">
                       <div className="text-lg mb-1">🌟</div>
-                      <div className="text-xs font-semibold text-gray-700">First Impression</div>
+                      <div className="text-xs font-semibold text-gray-700">
+                        {language === 'english' ? translations.firstImpression.english : translations.firstImpression.hindi}
+                      </div>
                     </div>
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 text-center">
                       <div className="text-lg mb-1">🎪</div>
-                      <div className="text-xs font-semibold text-gray-700">Public Persona</div>
+                      <div className="text-xs font-semibold text-gray-700">
+                        {language === 'english' ? translations.publicPersona.english : translations.publicPersona.hindi}
+                      </div>
                     </div>
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 text-center">
                       <div className="text-lg mb-1">🚀</div>
-                      <div className="text-xs font-semibold text-gray-700">Life Approach</div>
+                      <div className="text-xs font-semibold text-gray-700">
+                        {language === 'english' ? translations.lifeApproach.english : translations.lifeApproach.hindi}
+                      </div>
                     </div>
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 text-center">
                       <div className="text-lg mb-1">💫</div>
-                      <div className="text-xs font-semibold text-gray-700">Natural Style</div>
+                      <div className="text-xs font-semibold text-gray-700">
+                        {language === 'english' ? translations.naturalStyle.english : translations.naturalStyle.hindi}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -244,14 +326,13 @@ const AscendantReport = () => {
                 <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-300 mb-6">
                   <h3 className="text-lg font-bold text-gray-800 mb-2 md:text-base flex items-center">
                     <span className="text-2xl mr-2">💎</span>
-                    Embrace Your {ascendantData.asc_report.ascendant} Rising
+                    {language === 'english' ? `${translations.embraceTitle.english} ${ascendantData.asc_report.ascendant}` : `अपनी ${ascendantData.asc_report.ascendant} ${translations.embraceTitle.hindi}`}
                   </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed md:text-xs">
-                    Remember, your Rising sign is your cosmic invitation to the world. 
-                    It's the energy you naturally radiate and the lens through which you 
-                    experience life. Embrace this aspect of yourself - it's your unique 
-                    way of making your mark on the world.
-                  </p>
+                  <div className="bg-white bg-opacity-70 rounded-lg p-4">
+                    <p className="text-sm text-gray-700 leading-relaxed md:text-xs">
+                      {language === 'english' ? translations.embraceMessage.english : translations.embraceMessage.hindi}
+                    </p>
+                  </div>
                 </div>
               </>
             )}
@@ -260,24 +341,14 @@ const AscendantReport = () => {
             <div className="h-4"></div>
           </div>
 
-          {/* Navigation - Fixed at bottom */}
-          <div className="flex justify-between items-center p-6 bg-white bg-opacity-90 border-t border-gray-200 flex-shrink-0">
-            <button 
-              onClick={handleBack}
-              className="p-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-100 transition-all"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button 
-              onClick={handleNext}
-              className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
-            >
-              Next →
-            </button>
-          </div>
+          {/* Navigation Component - Fixed at bottom */}
+          <Navigation 
+            currentPage="ascendant"
+            nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+            backText={language === 'english' ? translations.back.english : translations.back.hindi}
+            showNext={true}
+            showBack={true}
+          />
         </div>
       </div>
     </div>

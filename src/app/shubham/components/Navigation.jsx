@@ -20,26 +20,39 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
 
   const getNavigationConfig = () => {
     const config = {
+      // Initial form pages
       'form': { next: '/shubham/form/birthplace', back: null },
       'birthplace': { next: '/shubham/overreview', back: '/shubham/form' },
       'overreview': { next: '/shubham/planets', back: '/shubham/form/birthplace' },
+      
+      // Planets section
       'planets': { next: '/shubham/planets/sun', back: '/shubham/overreview' },
       'planets/sun': { next: '/shubham/planets/moon', back: '/shubham/planets' },
       'planets/moon': { next: '/shubham/planets/mars', back: '/shubham/planets/sun' },
-      'planets/mars': { next: '/shubham/planets/jupiter', back: '/shubham/planets/moon' },
-      'planets/jupiter': { next: '/shubham/planets/venus', back: '/shubham/planets/mars' },
+      'planets/mars': { next: '/shubham/planets/mercurey', back: '/shubham/planets/moon' },
+      'planets/mercurey': { next: '/shubham/planets/jupiter', back: '/shubham/planets/mars' },
+      'planets/jupiter': { next: '/shubham/planets/venus', back: '/shubham/planets/mercurey' },
       'planets/venus': { next: '/shubham/planets/saturn', back: '/shubham/planets/jupiter' },
       'planets/saturn': { next: '/shubham/planets/rahu', back: '/shubham/planets/venus' },
       'planets/rahu': { next: '/shubham/planets/ketu', back: '/shubham/planets/saturn' },
       'planets/ketu': { next: '/shubham/planets/ending', back: '/shubham/planets/rahu' },
-      'planets/ending': { next: '/shubham/horoscope', back: '/shubham/planets/ketu' },
-      'horoscope': { next: '/shubham/kalsarpa_details', back: '/shubham/planets/ending' },
-      'kalsarpa_details': { next: '/shubham/manglikdosh', back: '/shubham/horoscope' },
-      'manglikdosh': { next: '/shubham/panchang', back: '/shubham/kalsarpa_details' },
-      'panchang': { next: '/shubham/rashi', back: '/shubham/manglikdosh' },
+      'planets/ending': { next: '/shubham/panchang', back: '/shubham/planets/ketu' },
+      
+      // Updated navigation flow based on your requirements:
+      // panchang -> rashi -> nakshatra -> ascendant -> gem_suggestion -> numero -> horoscope -> ghatchakra -> subscription
+      'panchang': { next: '/shubham/rashi', back: '/shubham/planets/ending' },
       'rashi': { next: '/shubham/nakshatra', back: '/shubham/panchang' },
-      'nakshatra': { next: '/shubham/subscription', back: '/shubham/rashi' },
-      'subscription': { next: null, back: '/shubham/nakshatra' }
+      'nakshatra': { next: '/shubham/nakshatra/ascendant', back: '/shubham/rashi' },
+      'ascendant': { next: '/shubham/nakshatra/gem_suggestion', back: '/shubham/nakshatra' },
+      'gem_suggestion': { next: '/shubham/nakshatra/numero', back: '/shubham/nakshatra/ascendant' },
+      'numero': { next: '/shubham/horoscope', back: '/shubham/gem_suggestion' },
+      'horoscope': { next: '/shubham/horoscope/ghatchakra', back: '/shubham/numero' },
+      'ghatchakra': { next: '/shubham/subscription', back: '/shubham/horoscope' },
+      'subscription': { next: null, back: '/shubham/ghatchakra' },
+      
+      // Remove old entries that are no longer needed
+      'kalsarpa_details': { next: '/shubham/manglikdosh', back: '/shubham/horoscope' },
+      'manglikdosh': { next: '/shubham/panchang', back: '/shubham/kalsarpa_details' }
     };
     return config[currentPage] || { next: null, back: null };
   };

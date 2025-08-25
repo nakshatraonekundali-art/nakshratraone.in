@@ -1,68 +1,52 @@
 'use client'
 import React, { useState } from 'react';
-import { useKundli } from '../../context/KundliContext';
 import Navigation from '../../components/Navigation';
+import { useKundli } from '../../context/KundliContext';
 
 const PlanetsEndingScreen = () => {
   const [loading, setLoading] = useState(false);
   const { language } = useKundli();
-  
+
   // Translations
   const translations = {
-    loading: {
-      english: "Loading...",
-      hindi: "लोड हो रहा है..."
-    },
-    title: {
-      english: "What is the purpose of your life, and what does your soul desire?",
-      hindi: "आपके जीवन का उद्देश्य क्या है, और आपकी आत्मा क्या चाहती है?"
-    },
-    description1: {
-      english: "\"Atma\" means soul, and \"karaka\" means significator. Atmakaraka is the planet that signifies the soul's desires. According to Vedic astrology, a soul is reborn because it has desires from previous lives that need fulfillment. The purpose of the new life is to provide another chance to satisfy those desires.",
-      hindi: "\"आत्मा\" का अर्थ है आत्मा, और \"कारक\" का अर्थ है संकेतक। आत्मकारक वह ग्रह है जो आत्मा की इच्छाओं का संकेत देता है। वैदिक ज्योतिष के अनुसार, एक आत्मा का पुनर्जन्म होता है क्योंकि उसकी पिछले जन्मों की इच्छाएं हैं जिन्हें पूरा करने की आवश्यकता है। नए जीवन का उद्देश्य उन इच्छाओं को संतुष्ट करने का एक और मौका प्रदान करना है।"
-    },
-    description2: {
-      english: "The Atmakaraka planet in your birth chart reveals these desires. It indicates whether you will fulfill them easily or face challenges in doing so. In my opinion, the Atmakaraka is one of the most crucial planets in your astrological chart.",
-      hindi: "आपके जन्म कुंडली में आत्मकारक ग्रह इन इच्छाओं को प्रकट करता है। यह इंगित करता है कि आप उन्हें आसानी से पूरा करेंगे या ऐसा करने में चुनौतियों का सामना करेंगे। मेरी राय में, आत्मकारक आपके ज्योतिषीय चार्ट में सबसे महत्वपूर्ण ग्रहों में से एक है।"
-    },
-    illustration: {
-      english: "The cosmic connection between your soul and planetary influences",
-      hindi: "आपकी आत्मा और ग्रहीय प्रभावों के बीच कॉस्मिक कनेक्शन"
-    },
-    understanding: {
-      english: "Understanding Your Soul's Journey",
-      hindi: "आपकी आत्मा की यात्रा को समझना"
-    },
-    insight1: {
-      english: "Your Atmakaraka planet reveals your soul's deepest desires and life purpose",
-      hindi: "आपका आत्मकारक ग्रह आपकी आत्मा की गहरी इच्छाओं और जीवन के उद्देश्य को प्रकट करता है"
-    },
-    insight2: {
-      english: "It shows whether you'll achieve your goals easily or face challenges",
-      hindi: "यह दिखाता है कि आप अपने लक्ष्यों को आसानी से प्राप्त करेंगे या चुनौतियों का सामना करेंगे"
-    },
-    insight3: {
-      english: "Understanding this helps you align with your spiritual path and karmic lessons",
-      hindi: "इसे समझने से आपको अपने आध्यात्मिक मार्ग और कार्मिक सबक के साथ संरेखित करने में मदद मिलती है"
-    },
-    next: {
-      english: "Next →",
-      hindi: "आगे →"
-    },
-    back: {
-      english: "Back",
-      hindi: "पीछे"
-    }
+    loading: language === 'hindi' ? 'लोड हो रहा है...' : 'Loading...',
+    next: language === 'hindi' ? 'अगला →' : 'Next →',
+    back: language === 'hindi' ? 'वापस' : 'Back',
+    mainTitle: language === 'hindi' 
+      ? 'आपके जीवन का उद्देश्य क्या है, और आपकी आत्मा क्या चाहती है?' 
+      : 'What is the purpose of your life, and what does your soul desire?',
+    atmaDescription1: language === 'hindi'
+      ? '"आत्मा" का अर्थ है आत्मा, और "कारक" का अर्थ है सूचक। आत्मकारक वह ग्रह है जो आत्मा की इच्छाओं को दर्शाता है। वैदिक ज्योतिष के अनुसार, एक आत्मा का पुनर्जन्म इसलिए होता है क्योंकि उसकी पिछले जन्मों की इच्छाएं हैं जिन्हें पूरा करना आवश्यक है।'
+      : '"Atma" means soul, and "karaka" means significator. Atmakaraka is the planet that signifies the soul\'s desires. According to Vedic astrology, a soul is reborn because it has desires from previous lives that need fulfillment.',
+    atmaDescription2: language === 'hindi'
+      ? 'आपकी जन्म कुंडली में आत्मकारक ग्रह इन इच्छाओं को प्रकट करता है। यह इंगित करता है कि आप उन्हें आसानी से पूरा करेंगे या इसमें चुनौतियों का सामना करेंगे। मेरी राय में, आत्मकारक आपकी ज्योतिषीय कुंडली में सबसे महत्वपूर्ण ग्रहों में से एक है।'
+      : 'The Atmakaraka planet in your birth chart reveals these desires. It indicates whether you will fulfill them easily or face challenges in doing so. In my opinion, the Atmakaraka is one of the most crucial planets in your astrological chart.',
+    cosmicConnection: language === 'hindi'
+      ? 'आपकी आत्मा और ग्रहों के प्रभाव के बीच ब्रह्मांडीय संबंध'
+      : 'The cosmic connection between your soul and planetary influences',
+    soulJourney: language === 'hindi'
+      ? 'अपनी आत्मा की यात्रा को समझना'
+      : 'Understanding Your Soul\'s Journey',
+    insight1: language === 'hindi'
+      ? 'आपका आत्मकारक ग्रह आपकी आत्मा की गहरी इच्छाओं और जीवन उद्देश्य को प्रकट करता है'
+      : 'Your Atmakaraka planet reveals your soul\'s deepest desires and life purpose',
+    insight2: language === 'hindi'
+      ? 'यह दिखाता है कि आप अपने लक्ष्यों को आसानी से प्राप्त करेंगे या चुनौतियों का सामना करेंगे'
+      : 'It shows whether you\'ll achieve your goals easily or face challenges',
+    insight3: language === 'hindi'
+      ? 'इसे समझना आपको अपने आध्यात्मिक मार्ग और कर्म के पाठों के साथ संरेखित करने में मदद करता है'
+      : 'Understanding this helps you align with your spiritual path and karmic lessons'
   };
 
-  // Function to handle next button click
+  // Function to handle next button click - navigate to Kalsarpa details
   const handleNext = () => {
-    window.location.href = '/shubham/horoscope';
+    setLoading(true);
+    window.location.href = '/shubham/kalsarpa_details';
   };
 
-  // Function to handle back button click
+  // Function to handle back button click - back to Jupiter
   const handleBack = () => {
-    window.location.href = '/shubham/planets/sun';
+    window.location.href = '/shubham/planets/jupiter';
   };
 
   if (loading) {
@@ -70,7 +54,7 @@ const PlanetsEndingScreen = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">{language === 'english' ? translations.loading.english : translations.loading.hindi}</p>
+          <p className="text-center mt-4 text-gray-600">{translations.loading}</p>
         </div>
       </div>
     );
@@ -94,18 +78,18 @@ const PlanetsEndingScreen = () => {
             {/* Main Title */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-800 mb-6 leading-tight md:text-xl">
-                {language === 'english' ? translations.title.english : translations.title.hindi}
+                {translations.mainTitle}
               </h1>
             </div>
 
             {/* Description Content */}
             <div className="mb-8">
               <p className="text-base text-gray-700 leading-relaxed mb-6 md:text-sm">
-                {language === 'english' ? translations.description1.english : translations.description1.hindi}
+                {translations.atmaDescription1}
               </p>
               
               <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                {language === 'english' ? translations.description2.english : translations.description2.hindi}
+                {translations.atmaDescription2}
               </p>
             </div>
 
@@ -128,14 +112,14 @@ const PlanetsEndingScreen = () => {
               </div>
               
               <p className="text-sm text-gray-600 italic">
-                {language === 'english' ? translations.illustration.english : translations.illustration.hindi}
+                {translations.cosmicConnection}
               </p>
             </div>
 
             {/* Key Insights Section */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200 mb-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4 text-center md:text-base">
-                {language === 'english' ? translations.understanding.english : translations.understanding.hindi}
+                {translations.soulJourney}
               </h3>
               
               <div className="space-y-4">
@@ -144,7 +128,7 @@ const PlanetsEndingScreen = () => {
                     <div className="text-white text-xs font-bold">1</div>
                   </div>
                   <p className="text-sm text-gray-700 md:text-xs">
-                    {language === 'english' ? translations.insight1.english : translations.insight1.hindi}
+                    {translations.insight1}
                   </p>
                 </div>
                 
@@ -153,7 +137,7 @@ const PlanetsEndingScreen = () => {
                     <div className="text-white text-xs font-bold">2</div>
                   </div>
                   <p className="text-sm text-gray-700 md:text-xs">
-                    {language === 'english' ? translations.insight2.english : translations.insight2.hindi}
+                    {translations.insight2}
                   </p>
                 </div>
                 
@@ -162,8 +146,33 @@ const PlanetsEndingScreen = () => {
                     <div className="text-white text-xs font-bold">3</div>
                   </div>
                   <p className="text-sm text-gray-700 md:text-xs">
-                    {language === 'english' ? translations.insight3.english : translations.insight3.hindi}
+                    {translations.insight3}
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Section Preview */}
+            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border border-red-200 mb-6">
+              <div className="mb-4 md:mb-3">
+                <button className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-red-600 md:text-xs">
+                  {language === 'hindi' ? 'अगला: कालसर्प योग' : 'NEXT: KALSARPA ANALYSIS'}
+                </button>
+              </div>
+              
+              <div className="flex items-start space-x-4 md:space-x-3">
+                <div className="flex-1">
+                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
+                    {language === 'hindi' 
+                      ? "कालसर्प योग आपकी कुंडली में राहु और केतु की स्थिति के आधार पर विशेष योग है जो आपके जीवन पर महत्वपूर्ण प्रभाव डालता है।"
+                      : "Kalsarpa Yoga is a special combination based on the position of Rahu and Ketu in your horoscope that significantly influences your life."
+                    }
+                  </p>
+                </div>
+                <div className="w-20 h-24 bg-gradient-to-br from-red-600 to-orange-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
+                    {language === 'hindi' ? 'कालसर्प योग' : 'KALSARPA YOGA'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -175,8 +184,8 @@ const PlanetsEndingScreen = () => {
           {/* Navigation - Fixed at bottom */}
           <Navigation 
             currentPage="planets-ending"
-            nextText={language === 'english' ? translations.next.english : translations.next.hindi}
-            backText={language === 'english' ? translations.back.english : translations.back.hindi}
+            nextText={translations.next}
+            backText={translations.back}
             onNext={handleNext}
             onBack={handleBack}
           />

@@ -15,7 +15,8 @@ const RahuAnalysis = () => {
     error: language === 'hindi' ? 'डेटा लोड करने में त्रुटि' : 'Error Loading Data',
     retry: language === 'hindi' ? 'पुनः प्रयास करें' : 'Retry',
     next: language === 'hindi' ? 'अगला →' : 'Next →',
-    back: language === 'hindi' ? 'वापस' : 'Back'
+    back: language === 'hindi' ? 'वापस' : 'Back',
+    loadDemoData: language === 'hindi' ? 'डेमो डेटा लोड करें' : 'Load Demo Data'
   };
 
   // API configuration
@@ -210,7 +211,7 @@ const RahuAnalysis = () => {
                 onClick={loadFallbackData} 
                 className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
               >
-                {language === 'hindi' ? 'डेमो डेटा लोड करें' : 'Load Demo Data'}
+                {translations.loadDemoData}
               </button>
             </div>
           </div>
@@ -279,7 +280,7 @@ const RahuAnalysis = () => {
 
             {/* House Report - Rahu themed colors */}
             {rahuData && rahuData.house_report && (
-              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-400 mb-6">
+              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-300 mb-6">
                 <p className="text-base text-gray-700 leading-relaxed md:text-sm">
                   {rahuData.house_report}
                 </p>
@@ -316,6 +317,10 @@ const RahuAnalysis = () => {
               </div>
             </div>
 
+            {/* Bottom padding for scrolling */}
+            <div className="h-4"></div>
+          </div>
+
           {/* Navigation - Fixed at bottom */}
           <Navigation 
             currentPage="planets/rahu"
@@ -326,7 +331,6 @@ const RahuAnalysis = () => {
           />
         </div>
       </div>
-    </div>
     </div>
   );
 };
