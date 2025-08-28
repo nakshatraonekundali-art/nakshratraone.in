@@ -44,7 +44,16 @@ const KalsarpaDetails = () => {
     userId: '643886',
     apiKey: '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf',
     baseUrl: 'https://json.astrologyapi.com/v1',
-    api: 'kalsarpa_details'
+    api: 'kalsarpa_details',
+    // Helper method to generate auth header
+    getAuthHeader: function() {
+      const credentials = `${this.userId}:${this.apiKey}`;
+      return `Basic ${btoa(credentials)}`;
+    },
+    // Helper method to get language header value
+    getLanguageHeader: function(lang) {
+      return lang === 'hindi' ? 'hi' : 'en';
+    }
   };
 
   // Map language to API language parameter (same as Jupiter)
@@ -62,11 +71,7 @@ const KalsarpaDetails = () => {
     tzone: 5.5
   };
 
-  // Function to get Basic Auth header (same as Jupiter)
-  const getAuthHeader = () => {
-    const credentials = `${API_CONFIG.userId}:${API_CONFIG.apiKey}`;
-    return `Basic ${btoa(credentials)}`;
-  };
+  // Using API_CONFIG.getAuthHeader() instead of standalone function
 
   // Function to simulate Kalsarpa data if API fails (fallback like Jupiter)
   const loadFallbackData = () => {
@@ -97,65 +102,74 @@ const KalsarpaDetails = () => {
       
       // Validate birth details first (same as Jupiter)
       const safeDetails = {
-        day: birthDetails?.day || 6,
-        month: birthDetails?.month || 1,
-        year: birthDetails?.year || 2000,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 6,
+        month: parseInt(birthDetails?.month) || 1,
+        year: parseInt(birthDetails?.year) || 2000,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
       console.log('Birth details being used:', safeDetails);
+      console.log(`Fetching Kalsarpa data from API: ${API_CONFIG.baseUrl}/${API_CONFIG.api}`);
       
-      // For now, let's skip the API call and load demo data directly
-      // since the API might be consistently returning errors
-      console.log('API might not be accessible, loading demo data...');
-      loadFallbackData();
-      return;
-      
-      // Commented out API call until endpoint is confirmed working
-      /*
-      const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': getAuthHeader(),
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Language': apiLanguage
-        },
-        body: JSON.stringify(safeDetails)
-      });
-      
-      if (!response.ok) {
-        let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+      try {
+        const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': API_CONFIG.getAuthHeader(),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Language': API_CONFIG.getLanguageHeader(language)
+          },
+          body: JSON.stringify(safeDetails)
+        });
         
-        try {
-          const errorData = await response.json();
-          if (errorData.error || errorData.message) {
-            errorMessage += ` - ${errorData.error || errorData.message}`;
+        console.log('API response status:', response.status);
+        
+        if (!response.ok) {
+          let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+          
+          try {
+            const errorData = await response.json();
+            console.log('Error data:', errorData);
+            if (errorData.error || errorData.message) {
+              errorMessage += ` - ${errorData.error || errorData.message}`;
+            }
+          } catch (e) {
+            console.log('Could not parse error response as JSON');
+            // If error response is not JSON, use the basic error message
           }
-        } catch (e) {
-          // If error response is not JSON, use the basic error message
+          
+          throw new Error(errorMessage);
         }
         
-        throw new Error(errorMessage);
+        const data = await response.json();
+        console.log('Kalsarpa Data received:', data);
+        
+        // Validate the response data
+        if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+          throw new Error('No data received from API');
+        }
+        
+        // Check if the response has the expected structure
+        if (!data.present && !data.kalsarpa_details) {
+          console.warn('API response missing expected fields');
+          throw new Error('Invalid data structure received from API');
+        }
+        
+        setKalsarpaData(data);
+        
+      } catch (apiError) {
+        console.error('API request failed:', apiError);
+        console.log('Loading fallback data due to API error');
+        loadFallbackData();
       }
-      
-      const data = await response.json();
-      console.log('Kalsarpa Data:', data);
-      
-      // Validate the response data
-      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
-        throw new Error('No data received from API');
-      }
-      
-      setKalsarpaData(data);
-      */
       
     } catch (error) {
-      console.error('Error fetching Kalsarpa data:', error);
+      console.error('Error in fetchKalsarpaData:', error);
       
       // Auto-load demo data on any error (same as Jupiter)
       loadFallbackData();

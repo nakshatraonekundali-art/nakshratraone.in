@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useKundli } from '../context/KundliContext';
 
-const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backText = "Back", showBack = true, showNext = true, disableBack = false }) => {
+const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backText = "Back", showBack = true, showNext = true, disableBack = false, disableNext = false }) => {
   const { formData, currentStep, language } = useKundli();
   
   // Default translations
@@ -106,14 +106,17 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
         navConfig.next ? (
           <Link
             href={navConfig.next}
-            className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
+            className={`bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm ${disableNext ? 'opacity-50 pointer-events-none' : ''}`}
+            aria-disabled={disableNext}
           >
             {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
           </Link>
         ) : (
           <button
             onClick={handleNext}
-            className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
+            disabled={disableNext}
+            className={`bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm ${disableNext ? 'opacity-50' : ''}`}
+            aria-disabled={disableNext}
           >
             {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
           </button>

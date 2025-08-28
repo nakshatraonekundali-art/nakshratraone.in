@@ -10,13 +10,22 @@ const HoroscopeChart = () => {
   const [error, setError] = useState('');
   const { language, formData } = useKundli();
 
-  // API configuration
+  // API configuration (same as Jupiter pattern)
   const API_CONFIG = {
     userId: '643886',
     apiKey: '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf',
     baseUrl: 'https://json.astrologyapi.com/v1',
     chartDataApi: 'horo_chart/D1', // D1 for main birth chart
-    chartImageApi: 'horo_chart_image/D1'
+    chartImageApi: 'horo_chart_image/D1',
+    // Helper method to generate auth header
+    getAuthHeader: function() {
+      const credentials = `${this.userId}:${this.apiKey}`;
+      return `Basic ${btoa(credentials)}`;
+    },
+    // Helper method to get language header value
+    getLanguageHeader: function(lang) {
+      return lang === 'hindi' ? 'hi' : 'en';
+    }
   };
 
   // Use birth details from context or fallback to defaults
@@ -197,11 +206,7 @@ const HoroscopeChart = () => {
     };
   };
 
-  // Function to get Basic Auth header
-  const getAuthHeader = () => {
-    const credentials = `${API_CONFIG.userId}:${API_CONFIG.apiKey}`;
-    return `Basic ${btoa(credentials)}`;
-  };
+  // Using API_CONFIG.getAuthHeader() instead of standalone function
 
   // Function to simulate Horoscope data if API fails (fallback)
   const loadFallbackData = () => {
@@ -293,27 +298,56 @@ const HoroscopeChart = () => {
     setChartImage(fallbackChartImage);
   };
 
-  // Function to fetch chart image (SVG)
-  const fetchChartImage = async () => {
+  // Function to fetch chart image (SVG) - updated to match Jupiter pattern
+  const fetchChartImage = async (safeDetails) => {
     try {
+      console.log(`Fetching chart image from API: ${API_CONFIG.baseUrl}/${API_CONFIG.chartImageApi}`);
+      
       const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.chartImageApi}`, {
         method: 'POST',
         headers: {
-          'Authorization': getAuthHeader(),
+          'Authorization': API_CONFIG.getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language === 'english' ? 'en' : 'hi'
+          'Accept-Language': API_CONFIG.getLanguageHeader(language)
         },
-        body: JSON.stringify(birthDetails)
+        body: JSON.stringify(safeDetails)
       });
       
+      console.log('Chart Image API response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`Chart Image API Error: ${response.status} - ${response.statusText}`);
+        let errorMessage = `Chart Image API Error: ${response.status} - ${response.statusText}`;
+        
+        try {
+          const errorData = await response.json();
+          console.log('Error data:', errorData);
+          if (errorData.error || errorData.message) {
+            errorMessage += ` - ${errorData.error || errorData.message}`;
+          }
+        } catch (e) {
+          console.log('Could not parse error response as JSON');
+        }
+        
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Chart Image Data:', data);
+      console.log('Chart Image Data received:', data);
+      
+      // Validate the response data
+      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+        throw new Error('No chart image data received from API');
+      }
+      
+      // Check if the response has the expected structure
+      if (!data.svg) {
+        console.warn('API response missing expected svg field');
+        throw new Error('Invalid chart image data structure received from API');
+      }
+      
       setChartImage(data);
+      return data;
       
     } catch (error) {
       console.error('Error fetching chart image:', error);
@@ -321,27 +355,56 @@ const HoroscopeChart = () => {
     }
   };
 
-  // Function to fetch chart data
-  const fetchChartData = async () => {
+  // Function to fetch chart data - updated to match Jupiter pattern
+  const fetchChartData = async (safeDetails) => {
     try {
+      console.log(`Fetching chart data from API: ${API_CONFIG.baseUrl}/${API_CONFIG.chartDataApi}`);
+      
       const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.chartDataApi}`, {
         method: 'POST',
         headers: {
-          'Authorization': getAuthHeader(),
+          'Authorization': API_CONFIG.getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language === 'english' ? 'en' : 'hi'
+          'Accept-Language': API_CONFIG.getLanguageHeader(language)
         },
-        body: JSON.stringify(birthDetails)
+        body: JSON.stringify(safeDetails)
       });
       
+      console.log('Chart Data API response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`Chart Data API Error: ${response.status} - ${response.statusText}`);
+        let errorMessage = `Chart Data API Error: ${response.status} - ${response.statusText}`;
+        
+        try {
+          const errorData = await response.json();
+          console.log('Error data:', errorData);
+          if (errorData.error || errorData.message) {
+            errorMessage += ` - ${errorData.error || errorData.message}`;
+          }
+        } catch (e) {
+          console.log('Could not parse error response as JSON');
+        }
+        
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Chart Data:', data);
+      console.log('Chart Data received:', data);
+      
+      // Validate the response data
+      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+        throw new Error('No chart data received from API');
+      }
+      
+      // Check if the response has the expected structure
+      if (!Array.isArray(data)) {
+        console.warn('API response is not an array as expected');
+        throw new Error('Invalid chart data structure received from API');
+      }
+      
       setChartData(data);
+      return data;
       
     } catch (error) {
       console.error('Error fetching chart data:', error);
@@ -349,45 +412,73 @@ const HoroscopeChart = () => {
     }
   };
 
-  // Function to fetch both chart image and data
+  // Function to fetch both chart image and data - updated to match Jupiter pattern
   const fetchHoroscopeData = async () => {
     try {
       setLoading(true);
       setError('');
       
-      // Validate birth details first
+      console.log('Starting horoscope data fetch process...');
+      
+      // Validate birth details with numeric parsing for safety
       const safeDetails = {
         name: birthDetails?.name || "User",
-        day: birthDetails?.day || 4,
-        month: birthDetails?.month || 8,
-        year: birthDetails?.year || 2004,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 4,
+        month: parseInt(birthDetails?.month) || 8,
+        year: parseInt(birthDetails?.year) || 2004,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
-      console.log('Birth details being used:', safeDetails);
+      console.log('Validated birth details:', safeDetails);
       
       // For now, let's load demo data directly since API might have issues
-      console.log('Loading demo horoscope data...');
+      // When API is stable, uncomment the API calls below and comment out this section
+      console.log('Loading demo horoscope data (API calls disabled)...');
       loadFallbackData();
       return;
       
-      // Commented out API calls - uncomment when API is stable
+      // Uncomment this section when API is stable
       /*
-      // Fetch both APIs simultaneously
-      await Promise.all([
-        fetchChartImage(),
-        fetchChartData()
-      ]);
+      console.log('Attempting to fetch data from both APIs...');
+      
+      try {
+        // Fetch both APIs simultaneously
+        const [imageData, chartData] = await Promise.all([
+          fetchChartImage(safeDetails),
+          fetchChartData(safeDetails)
+        ]);
+        
+        console.log('Successfully fetched both chart image and data');
+        
+        // Validate that we have the necessary data
+        if (!imageData?.svg) {
+          throw new Error('Missing SVG data in chart image response');
+        }
+        
+        if (!Array.isArray(chartData) || chartData.length === 0) {
+          throw new Error('Invalid or empty chart data received');
+        }
+        
+        // Data is valid, update state
+        setChartImage(imageData);
+        setChartData(chartData);
+        
+      } catch (apiError) {
+        console.error('API fetch failed:', apiError.message);
+        throw apiError; // Re-throw to be caught by outer catch block
+      }
       */
       
     } catch (error) {
-      console.error('Error fetching horoscope data:', error);
+      console.error('Error in horoscope data fetch process:', error);
+      setError(error.message || 'Failed to load horoscope data');
       
       // Auto-load demo data on any error
+      console.log('Loading fallback demo data due to error...');
       loadFallbackData();
       
     } finally {
@@ -395,20 +486,32 @@ const HoroscopeChart = () => {
     }
   };
 
-  // Fetch data on component mount
+  // Fetch data on component mount - updated to match Jupiter pattern
   useEffect(() => {
-    console.log('useKundli context data:', { language, formData });
-    console.log('Birth details:', birthDetails);
+    console.log('Horoscope component mounted or language changed');
+    console.log('Current language:', language);
+    console.log('Context data:', { language, formData });
+    console.log('Birth details being used:', birthDetails);
+    
+    // Fetch horoscope data with current language and birth details
     fetchHoroscopeData();
+    
+    // Debug log for development
+    console.log(`Horoscope data fetch initiated with language: ${language}`);
   }, [language]); // Re-fetch when language changes
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
+        <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">
+          <h2 className="text-center mt-4 text-gray-800 font-medium">
             {language === 'english' ? translations.loading.english : translations.loading.hindi}
+          </h2>
+          <p className="text-center mt-2 text-gray-600 text-sm">
+            {language === 'english' 
+              ? "Analyzing your birth chart and planetary positions..." 
+              : "आपके जन्म कुंडली और ग्रहों की स्थिति का विश्लेषण किया जा रहा है..."}
           </p>
         </div>
       </div>
@@ -419,22 +522,27 @@ const HoroscopeChart = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
-          <div className="text-red-600 text-center">
-            <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold mb-2">
+          <div className="text-center">
+            <div className="text-4xl mb-4 text-amber-500">⚠️</div>
+            <h2 className="text-xl font-bold mb-2 text-gray-800">
               {language === 'english' ? translations.error.english : translations.error.hindi}
             </h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
-            <div className="flex flex-col space-y-2">
+            <p className="text-xs text-gray-500 mb-4">
+              {language === 'english' 
+                ? "We're having trouble connecting to our astrology servers. Please try again or view demo data." 
+                : "हमें अपने ज्योतिष सर्वर से कनेक्ट करने में समस्या हो रही है। कृपया पुनः प्रयास करें या डेमो डेटा देखें।"}
+            </p>
+            <div className="flex flex-col space-y-3">
               <button 
                 onClick={fetchHoroscopeData} 
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
               >
                 {language === 'english' ? translations.retry.english : translations.retry.hindi}
               </button>
               <button 
                 onClick={loadFallbackData} 
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
               >
                 {language === 'english' ? translations.loadDemo.english : translations.loadDemo.hindi}
               </button>

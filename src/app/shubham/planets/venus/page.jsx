@@ -47,8 +47,14 @@ const VenusAnalysis = () => {
     return `Basic ${btoa(credentials)}`;
   };
 
-  // Function to simulate Venus data if API fails (fallback)
-  const loadFallbackData = () => {
+  // Helper function to strip HTML tags for security
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '');
+};
+
+// Function to simulate Venus data if API fails (fallback)
+const loadFallbackData = () => {
     const fallbackData = {
       house_report: language === 'hindi' 
         ? "शुक्र ग्रह आपकी जन्म कुंडली में कुंभ राशि के धनिष्ठा नक्षत्र में तीसरे भाव में स्थित है। यह स्थिति आपको संचार कला, रचनात्मक अभिव्यक्ति, और भाई-बहनों के साथ मधुर संबंधों का वरदान देती है। आप एक प्राकृतिक कलाकार हैं जो अपनी बात को सुंदर और प्रभावी तरीके से कह सकते हैं। आपमें लेखन, संगीत, या अन्य कलात्मक क्षेत्रों में असाधारण प्रतिभा है। यह स्थिति छोटी यात्राओं से लाभ, स्थानीय व्यापार में सफलता, और मीडिया या संचार क्षेत्र में उन्नति दर्शाती है। आपके पास एक चुंबकीय व्यक्तित्व है जो दूसरों को आकर्षित करता है। साहसिक कार्यों में भाग लेने और नई चीजें सीखने की प्रबल इच्छा है। वाणी में मिठास और दूसरों को प्रभावित करने की क्षमता आपकी विशेषता है।"
@@ -65,97 +71,93 @@ const VenusAnalysis = () => {
       setLoading(true);
       setError(''); // Clear previous errors
       
-      // Validate birth details first
+      // Validate birth details first and ensure they are numbers
       const safeDetails = {
-        day: birthDetails?.day || 6,
-        month: birthDetails?.month || 1,
-        year: birthDetails?.year || 2000,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 6,
+        month: parseInt(birthDetails?.month) || 1,
+        year: parseInt(birthDetails?.year) || 2000,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
       console.log('Birth details being used:', safeDetails);
+      console.log('API Language:', apiLanguage);
       
-      // For now, let's skip the API call and load demo data directly
-      // since the API is consistently returning 405 errors
-      console.log('API is not accessible, loading demo data...');
-      loadFallbackData();
-      return;
-      
-      // Commented out API call until endpoint is fixed
-      /*
-      // Create URL with query parameters for GET request
-      const queryParams = new URLSearchParams({
-        day: safeDetails.day.toString(),
-        month: safeDetails.month.toString(),
-        year: safeDetails.year.toString(),
-        hour: safeDetails.hour.toString(),
-        min: safeDetails.min.toString(),
-        lat: safeDetails.lat.toString(),
-        lon: safeDetails.lon.toString(),
-        tzone: safeDetails.tzone.toString(),
-        lang: apiLanguage
-      });
-
-      // Try POST request first (original method)
-      let response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
+      // Make API call using the working pattern from Jupiter analysis
+      const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
         method: 'POST',
         headers: {
           'Authorization': getAuthHeader(),
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Language': apiLanguage
+          'Accept-Language': apiLanguage // This is the key based on working pattern
         },
-        body: JSON.stringify(safeDetails)
+        body: JSON.stringify({
+          day: safeDetails.day,
+          month: safeDetails.month, 
+          year: safeDetails.year,
+          hour: safeDetails.hour,
+          min: safeDetails.min,
+          lat: safeDetails.lat,
+          lon: safeDetails.lon,
+          tzone: safeDetails.tzone
+          // Note: No 'lang' parameter in body, using Accept-Language header instead
+        })
       });
       
-      // If POST fails with 405, try GET request
-      if (response.status === 405) {
-        console.log('POST method not allowed, trying GET request...');
-        response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}?${queryParams}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': getAuthHeader(),
-            'Accept': 'application/json',
-            'Accept-Language': apiLanguage
-          }
-        });
-      }
+      console.log('API Response status:', response.status);
+      console.log('Request payload:', {
+        day: safeDetails.day,
+        month: safeDetails.month, 
+        year: safeDetails.year,
+        hour: safeDetails.hour,
+        min: safeDetails.min,
+        lat: safeDetails.lat,
+        lon: safeDetails.lon,
+        tzone: safeDetails.tzone,
+        'Accept-Language': apiLanguage
+      });
       
       if (!response.ok) {
-        // Provide more detailed error information
         let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
         
         try {
           const errorData = await response.json();
           if (errorData.error || errorData.message) {
-            errorMessage += ` - ${errorData.error || errorData.message}`;
+            errorMessage += ` - ${JSON.stringify(errorData)}`;
           }
         } catch (e) {
-          // If error response is not JSON, use the basic error message
+          console.log('Error response is not JSON:', e);
         }
         
         throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Venus Data:', data);
+      console.log('Venus Data received from API:', data);
       
       // Validate the response data
       if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
         throw new Error('No data received from API');
       }
       
+      // Check if we have the expected structure
+      if (!data.house_report && !data.planet) {
+        console.warn('Unexpected API response structure:', data);
+        throw new Error('Invalid API response structure');
+      }
+      
       setVenusData(data);
-      */
+      console.log('Venus data set successfully:', data);
       
     } catch (error) {
       console.error('Error fetching Venus data:', error);
+      setError(error.message);
       
       // Auto-load demo data on any error
+      console.log('Loading fallback data due to error...');
       loadFallbackData();
       
     } finally {
@@ -191,7 +193,7 @@ const VenusAnalysis = () => {
     );
   }
 
-  if (error) {
+  if (error && !venusData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
@@ -281,7 +283,7 @@ const VenusAnalysis = () => {
             {venusData && venusData.house_report && (
               <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-400 mb-6">
                 <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                  {venusData.house_report}
+                  {stripHtmlTags(venusData.house_report)}
                 </p>
               </div>
             )}

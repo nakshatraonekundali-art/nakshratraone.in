@@ -56,6 +56,12 @@ const SunAnalysis = () => {
     return `Basic ${btoa(credentials)}`;
   };
 
+  // Helper function to strip HTML tags for security
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '');
+  };
+
   // Function to simulate Sun data if API fails (fallback)
   const loadFallbackData = () => {
     const fallbackData = {
@@ -74,43 +80,23 @@ const SunAnalysis = () => {
       setLoading(true);
       setError(''); // Clear previous errors
       
-      // Validate birth details first
+      // Validate birth details first and ensure numeric types
       const safeDetails = {
-        day: birthDetails?.day || 6,
-        month: birthDetails?.month || 1,
-        year: birthDetails?.year || 2000,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 6,
+        month: parseInt(birthDetails?.month) || 1,
+        year: parseInt(birthDetails?.year) || 2000,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
       console.log('Birth details being used:', safeDetails);
       
-      // For now, let's skip the API call and load demo data directly
-      // since the API is consistently returning 405 errors
-      console.log('API is not accessible, loading demo data...');
-      loadFallbackData();
-      return;
-      
-      // Commented out API call until endpoint is fixed
-      /*
-      // Create URL with query parameters for GET request
-      const queryParams = new URLSearchParams({
-        day: safeDetails.day.toString(),
-        month: safeDetails.month.toString(),
-        year: safeDetails.year.toString(),
-        hour: safeDetails.hour.toString(),
-        min: safeDetails.min.toString(),
-        lat: safeDetails.lat.toString(),
-        lon: safeDetails.lon.toString(),
-        tzone: safeDetails.tzone.toString(),
-        lang: apiLanguage
-      });
-
-      // Try POST request first (original method)
-      let response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
+      // Make POST request with proper headers like Jupiter
+      console.log(`Fetching Sun data from: ${API_CONFIG.baseUrl}/${API_CONFIG.api}`);
+      const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
         method: 'POST',
         headers: {
           'Authorization': getAuthHeader(),
@@ -121,18 +107,7 @@ const SunAnalysis = () => {
         body: JSON.stringify(safeDetails)
       });
       
-      // If POST fails with 405, try GET request
-      if (response.status === 405) {
-        console.log('POST method not allowed, trying GET request...');
-        response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}?${queryParams}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': getAuthHeader(),
-            'Accept': 'application/json',
-            'Accept-Language': apiLanguage
-          }
-        });
-      }
+      console.log('API Response status:', response.status);
       
       if (!response.ok) {
         // Provide more detailed error information
@@ -140,10 +115,12 @@ const SunAnalysis = () => {
         
         try {
           const errorData = await response.json();
+          console.log('Error data:', errorData);
           if (errorData.error || errorData.message) {
             errorMessage += ` - ${errorData.error || errorData.message}`;
           }
         } catch (e) {
+          console.log('Could not parse error response as JSON');
           // If error response is not JSON, use the basic error message
         }
         
@@ -153,18 +130,25 @@ const SunAnalysis = () => {
       const data = await response.json();
       console.log('Sun Data:', data);
       
-      // Validate the response data
+      // Validate the response data structure like Jupiter
       if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
         throw new Error('No data received from API');
       }
       
+      // Check for required fields in the response
+      if (!data.house_report || !data.planet) {
+        console.error('Invalid API response format:', data);
+        throw new Error('Invalid data format received from API');
+      }
+      
       setSunData(data);
-      */
       
     } catch (error) {
       console.error('Error fetching Sun data:', error);
+      setError(error.message);
       
       // Auto-load demo data on any error
+      console.log('Loading fallback data due to error...');
       loadFallbackData();
       
     } finally {
@@ -200,7 +184,7 @@ const SunAnalysis = () => {
     );
   }
 
-  if (error) {
+  if (error && !sunData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
@@ -285,7 +269,7 @@ const SunAnalysis = () => {
             {sunData && sunData.house_report && (
               <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-300 mb-6">
                 <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                  {sunData.house_report}
+                  {stripHtmlTags(sunData.house_report)}
                 </p>
               </div>
             )}
@@ -339,4 +323,4 @@ const SunAnalysis = () => {
   );
 };
 
-export default SunAnalysis; 
+export default SunAnalysis;

@@ -9,12 +9,21 @@ const PanchangDetails = () => {
   const [error, setError] = useState('');
   const { language, formData } = useKundli();
 
-  // API configuration
+  // API configuration (same as Jupiter pattern)
   const API_CONFIG = {
     userId: '643886',
     apiKey: '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf',
     baseUrl: 'https://json.astrologyapi.com/v1',
-    api: 'advanced_panchang'
+    api: 'advanced_panchang',
+    // Helper method to generate auth header
+    getAuthHeader: function() {
+      const credentials = `${this.userId}:${this.apiKey}`;
+      return `Basic ${btoa(credentials)}`;
+    },
+    // Helper method to get language header value
+    getLanguageHeader: function(lang) {
+      return lang === 'hindi' ? 'hi' : 'en';
+    }
   };
 
   // Map language to API language parameter
@@ -44,11 +53,7 @@ const PanchangDetails = () => {
     tzone: 5.5
   };
 
-  // Function to get Basic Auth header
-  const getAuthHeader = () => {
-    const credentials = `${API_CONFIG.userId}:${API_CONFIG.apiKey}`;
-    return `Basic ${btoa(credentials)}`;
-  };
+  // Using API_CONFIG.getAuthHeader() instead of standalone function
 
   // Function to load fallback demo data
   const loadFallbackData = () => {
@@ -144,58 +149,78 @@ const PanchangDetails = () => {
     setPanchangData(fallbackData);
   };
 
-  // Function to fetch Panchang data
+  // Function to fetch Panchang data (updated to match Jupiter pattern)
   const fetchPanchangData = async () => {
     try {
       setLoading(true);
       setError(''); // Clear previous errors
       
-      // Validate birth details first
+      // Validate birth details first with proper type conversion
       const safeDetails = {
-        day: birthDetails?.day || 4,
-        month: birthDetails?.month || 8,
-        year: birthDetails?.year || 2004,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 4,
+        month: parseInt(birthDetails?.month) || 8,
+        year: parseInt(birthDetails?.year) || 2004,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
       console.log('Birth details being used:', safeDetails);
+      console.log(`Fetching Panchang data from API: ${API_CONFIG.baseUrl}/${API_CONFIG.api}`);
       
-      // For now, let's skip the API call and load demo data directly
-      // since the API might have issues
-      console.log('Loading demo data for better user experience...');
-      loadFallbackData();
-      return;
-      
-      // Commented out API call - uncomment when API is stable
-      
-      const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': getAuthHeader(),
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Language': apiLanguage
-        },
-        body: JSON.stringify(safeDetails)
-      });
-      
-      if (!response.ok) {
-        let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+      try {
+        const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': API_CONFIG.getAuthHeader(),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Language': API_CONFIG.getLanguageHeader(language)
+          },
+          body: JSON.stringify(safeDetails)
+        });
         
-        try {
-          const errorData = await response.json();
-          if (errorData.error || errorData.message) {
-            errorMessage += ` - ${errorData.error || errorData.message}`;
+        console.log('API response status:', response.status);
+        
+        if (!response.ok) {
+          let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+          
+          try {
+            const errorData = await response.json();
+            console.log('Error data:', errorData);
+            if (errorData.error || errorData.message) {
+              errorMessage += ` - ${errorData.error || errorData.message}`;
+            }
+          } catch (e) {
+            console.log('Could not parse error response as JSON');
+            // If error response is not JSON, use the basic error message
           }
-        } catch (e) {
-          // If error response is not JSON, use the basic error message
+          
+          throw new Error(errorMessage);
         }
         
-        throw new Error(errorMessage);
+        const data = await response.json();
+        console.log('Panchang Data received:', data);
+        
+        // Validate the response data
+        if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+          throw new Error('No data received from API');
+        }
+        
+        // Check if the response has the expected structure
+        if (!data.tithi && !data.nakshatra) {
+          console.warn('API response missing expected fields');
+          throw new Error('Invalid data structure received from API');
+        }
+        
+        setPanchangData(data);
+        
+      } catch (apiError) {
+        console.error('API request failed:', apiError);
+        console.log('Loading fallback data due to API error');
+        loadFallbackData();
       }
       
       const data = await response.json();
@@ -220,11 +245,18 @@ const PanchangDetails = () => {
     }
   };
 
-  // Fetch data on component mount
+  // Fetch data on component mount - updated to match Jupiter pattern
   useEffect(() => {
-    console.log('useKundli context data:', { language, formData });
-    console.log('Birth details:', birthDetails);
+    console.log('Panchang component mounted or language changed');
+    console.log('Current language:', language);
+    console.log('Context data:', { language, formData });
+    console.log('Birth details being used:', birthDetails);
+    
+    // Fetch panchang data with current language and birth details
     fetchPanchangData();
+    
+    // Debug log for development
+    console.log(`Panchang data fetch initiated with language: ${language}`);
   }, [language]); // Re-fetch when language changes
 
   // Function to handle next button click
@@ -260,9 +292,12 @@ const PanchangDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
+        <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">{translations.loading}</p>
+          <h2 className="text-center mt-4 font-medium text-gray-800">{translations.loading}</h2>
+          <p className="text-center mt-2 text-sm text-gray-600">
+            {language === 'hindi' ? 'आपका वैदिक पंचांग विश्लेषण किया जा रहा है...' : 'Analyzing your Vedic calendar details...'}
+          </p>
         </div>
       </div>
     );

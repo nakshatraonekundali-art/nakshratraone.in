@@ -2,14 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useKundli } from '../../context/KundliContext';
 import Navigation from '../../components/Navigation';
+import { useRouter } from 'next/navigation';
 
 const BirthPlace = () => {
-  const { formData, updateFormData, language } = useKundli();
+  const { formData, updateFormData, language, getBirthDetails } = useKundli();
   const [country, setCountry] = useState(formData.country || 'India');
   const [city, setCity] = useState(formData.city || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter();
   const debounceRef = useRef(null);
   
   // Translations
@@ -439,6 +443,49 @@ const BirthPlace = () => {
     setShowSuggestions(false);
     setSuggestions([]);
   };
+  
+  // Handle form submission
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+      setError(null);
+      
+      // Update form data with latest city and country
+      updateFormData({ city, country });
+      
+      // Prepare data for API
+      const submitData = {
+        ...formData,
+        city,
+        country
+      };
+      
+      // Call API to save form data
+      const response = await fetch('/api/kundli/save-form-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to save form data');
+      }
+      
+      console.log('Form data saved successfully:', result);
+      
+      // Navigate to overview page
+      router.push('/shubham/overreview');
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError(err.message || 'An error occurred while saving your data');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleCityBlur = () => {
     // Delay hiding suggestions to allow clicking
@@ -641,14 +688,25 @@ const BirthPlace = () => {
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+          
           {/* Navigation Buttons */}
           <div className="pt-32 pb-6">
             <Navigation 
               currentPage="birthplace" 
-              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              nextText={submitting ? 
+                (language === 'english' ? 'Saving...' : 'सहेज रहा है...') : 
+                (language === 'english' ? translations.next.english : translations.next.hindi)
+              }
               backText={language === 'english' ? translations.back.english : translations.back.hindi}
-              onNext={() => window.location.href = "/shubham/overreview"}
+              onNext={handleSubmit}
               onBack={() => window.location.href = "/shubham/form"}
+              disableNext={submitting}
             />
           </div>
         </div>

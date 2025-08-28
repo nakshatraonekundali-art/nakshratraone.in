@@ -171,7 +171,7 @@ const Rashi = () => {
           'Authorization': getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language
+          'Accept-Language': language === 'english' ? 'en' : 'hi'
         },
         body: JSON.stringify(birthDetails)
       });

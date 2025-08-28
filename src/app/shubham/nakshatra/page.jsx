@@ -14,7 +14,16 @@ const NakshatraPrediction = () => {
     userId: '643886',
     apiKey: '8cfa24ac82f34fa17f090ed5a6a2122b9f3e10bf',
     baseUrl: 'https://json.astrologyapi.com/v1',
-    api: 'daily_nakshatra_prediction'
+    api: 'daily_nakshatra_prediction',
+    // Helper method to generate auth header
+    getAuthHeader: function() {
+      const credentials = `${this.userId}:${this.apiKey}`;
+      return `Basic ${btoa(credentials)}`;
+    },
+    // Helper method to get language header value
+    getLanguageHeader: function(lang) {
+      return lang === 'hindi' ? 'hi' : 'en';
+    }
   };
 
   // Birth details
@@ -91,66 +100,187 @@ const NakshatraPrediction = () => {
     back: {
       english: "← Back to Rashi",
       hindi: "← राशि पर वापस जाएं"
+    },
+    // Additional translations for context words
+    nakshatra: {
+      english: "Nakshatra",
+      hindi: "नक्षत्र"
+    },
+    universalGods: {
+      english: "Universal Gods",
+      hindi: "विश्वदेव"
+    },
+    vishvadevas: {
+      english: "Vishvadevas",
+      hindi: "विश्वदेव"
+    },
+    bornBetween: {
+      english: "You were born between",
+      hindi: "आपका जन्म इनके बीच हुआ है"
+    },
+    ruledByPlanet: {
+      english: "and you're ruled by the planet",
+      hindi: "और आप इस ग्रह द्वारा शासित हैं"
+    },
+    associatedWith: {
+      english: "Your Nakshatra is associated with",
+      hindi: "आपका नक्षत्र इनसे जुड़ा है"
+    },
+    symbolizedBy: {
+      english: "and it is symbolized by the tusk of an elephant, which represents strength, power, and wisdom. You are a natural leader and possess a strong sense of purpose.",
+      hindi: "और यह हाथी के दांत से प्रतीकित होता है, जो शक्ति, सामर्थ्य और बुद्धिमता का प्रतिनिधित्व करता है। आप एक प्राकृतिक नेता हैं और आपके पास एक मजबूत उद्देश्य की भावना है।"
+    },
+    helloNakshatra: {
+      english: "Hello",
+      hindi: "नमस्कार"
+    },
+    personalityDescription: {
+      english: "As a",
+      hindi: "एक"
+    },
+    personalityDescription2: {
+      english: ", you have a strong and dynamic personality. You possess a natural charisma and leadership abilities that inspire others to follow you. You are ambitious and goal-oriented, and you have a strong sense of purpose in life. You are also deeply spiritual and seek to understand the meaning and purpose of existence. You have a sharp mind and an analytical approach to problem-solving.",
+      hindi: " के रूप में, आपके पास एक मजबूत और गतिशील व्यक्तित्व है। आपके पास प्राकृतिक करिश्मा और नेतृत्व क्षमताएं हैं जो दूसरों को आपका अनुसरण करने के लिए प्रेरित करती हैं। आप महत्वाकांक्षी और लक्ष्य-उन्मुख हैं, और जीवन में आपका एक मजबूत उद्देश्य है। आप गहराई से आध्यात्मिक भी हैं और अस्तित्व के अर्थ और उद्देश्य को समझने की कोशिश करते हैं। आपके पास तेज दिमाग और समस्या-समाधान के लिए एक विश्लेषणात्मक दृष्टिकोण है।"
     }
   };
 
-  // Function to get Basic Auth header
-  const getAuthHeader = () => {
-    const credentials = `${API_CONFIG.userId}:${API_CONFIG.apiKey}`;
-    return `Basic ${btoa(credentials)}`;
+  // Using API_CONFIG.getAuthHeader() instead of standalone function
+
+  // Function to load fallback data if API fails
+  const loadFallbackData = () => {
+    const fallbackData = {
+      birth_moon_nakshatra: language === 'english' ? 'Uttara Bhadrapada' : 'उत्तर भाद्रपद',
+      prediction_date: new Date().toLocaleDateString(),
+      prediction: {
+        health: language === 'english' 
+          ? "Take care of your health today. Focus on hydration and rest." 
+          : "आज अपने स्वास्थ्य का ध्यान रखें। हाइड्रेशन और आराम पर ध्यान दें।",
+        emotions: language === 'english'
+          ? "Your emotional balance is strong today. Practice gratitude."
+          : "आज आपका भावनात्मक संतुलन मजबूत है। कृतज्ञता का अभ्यास करें।",
+        profession: language === 'english'
+          ? "Good day for career advancement. Take initiative in meetings."
+          : "करियर में आगे बढ़ने के लिए अच्छा दिन है। बैठकों में पहल करें।",
+        personal_life: language === 'english'
+          ? "Spend quality time with family. Resolve any pending issues."
+          : "परिवार के साथ गुणवत्तापूर्ण समय बिताएं। किसी भी लंबित मुद्दे को हल करें।",
+        luck: language === 'english'
+          ? "Lucky colors are yellow and orange today."
+          : "आज के भाग्यशाली रंग पीला और नारंगी हैं।",
+        travel: language === 'english'
+          ? "Short trips will be beneficial."
+          : "छोटी यात्राएं फायदेमंद होंगी।"
+      }
+    };
+    
+    console.log('Loading fallback Nakshatra data:', fallbackData);
+    setNakshatraData(fallbackData);
   };
 
   // Function to fetch Nakshatra prediction data
   const fetchNakshatraData = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError(''); // Clear previous errors
+      
+      // Validate birth details first and ensure they are numbers
+      const safeDetails = {
+        name: birthDetails?.name || "Shubham",
+        day: parseInt(birthDetails?.day) || 4,
+        month: parseInt(birthDetails?.month) || 8,
+        year: parseInt(birthDetails?.year) || 2010,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
+      };
+      
+      console.log('Birth details being used:', safeDetails);
+      console.log('API Language:', API_CONFIG.getLanguageHeader(language));
+      
       const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
         method: 'POST',
         headers: {
-          'Authorization': getAuthHeader(),
+          'Authorization': API_CONFIG.getAuthHeader(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Accept-Language': language === 'english' ? 'en' : 'hi'
+          'Accept-Language': API_CONFIG.getLanguageHeader(language)
         },
-        body: JSON.stringify(birthDetails)
+        body: JSON.stringify(safeDetails)
       });
       
+      console.log('API Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+        
+        try {
+          const errorData = await response.json();
+          if (errorData.error || errorData.message) {
+            errorMessage += ` - ${JSON.stringify(errorData)}`;
+          }
+        } catch (e) {
+          console.log('Error response is not JSON:', e);
+        }
+        
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Nakshatra Data:', data);
+      console.log('Nakshatra Data received from API:', data);
+      
+      // Validate the response data
+      if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+        throw new Error('No data received from API');
+      }
+      
+      // Check if we have the expected structure
+      if (!data.birth_moon_nakshatra || !data.prediction) {
+        console.warn('Unexpected API response structure:', data);
+        throw new Error('Invalid API response structure');
+      }
+      
       setNakshatraData(data);
+      console.log('Nakshatra data set successfully:', data);
       
     } catch (error) {
       console.error('Error fetching Nakshatra data:', error);
-      setError(`Failed to load data: ${error.message}`);
+      setError(error.message);
+      
+      // Load fallback data on any error
+      console.log('Loading fallback data due to error:', error.message);
+      loadFallbackData();
+      
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch data on component mount
+  // Fetch data on component mount and when language changes
   useEffect(() => {
+    console.log('useKundli context data:', { language });
+    console.log('Birth details:', birthDetails);
     fetchNakshatraData();
-  }, []);
+  }, [language]); // Re-fetch when language changes
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="bg-gray-50 rounded-lg p-8 shadow-xl">
+        <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-center mt-4 text-gray-600">
+          <h2 className="text-center mt-4 text-gray-800 font-medium">
             {language === 'english' ? translations.loading.english : translations.loading.hindi}
+          </h2>
+          <p className="text-center mt-2 text-sm text-gray-600">
+            {language === 'english' ? 'Analyzing your birth star...' : 'आपके जन्म नक्षत्र का विश्लेषण किया जा रहा है...'}
           </p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !nakshatraData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
@@ -160,12 +290,20 @@ const NakshatraPrediction = () => {
               {language === 'english' ? translations.error.english : translations.error.hindi}
             </h2>
             <p className="text-sm text-gray-600 mb-4">{error}</p>
-            <button 
-              onClick={fetchNakshatraData} 
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-            >
-              {language === 'english' ? translations.retry.english : translations.retry.hindi}
-            </button>
+            <div className="flex flex-col space-y-2">
+              <button 
+                onClick={fetchNakshatraData} 
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+              >
+                {language === 'english' ? translations.retry.english : translations.retry.hindi}
+              </button>
+              <button 
+                onClick={loadFallbackData} 
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+              >
+                {language === 'english' ? 'Load Demo Data' : 'डेमो डेटा लोड करें'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -180,7 +318,9 @@ const NakshatraPrediction = () => {
           {/* Header - Fixed */}
           <div className="text-center pt-8 pb-6 px-6 flex-shrink-0 md:pt-6 md:pb-4 bg-gradient-to-b from-pink-50 via-rose-50 to-purple-50 sticky top-0 z-10 md:relative md:sticky-none">
             <div className="flex items-center justify-center mb-6 md:mb-3">
-              <div className="text-orange-500 text-xl font-bold md:text-lg">Nakshatra</div>
+              <div className="text-orange-500 text-xl font-bold md:text-lg">
+                {language === 'english' ? 'Nakshatra' : 'नक्षत्र'}
+              </div>
               <div className="text-blue-500 text-xl font-bold md:text-lg">One</div>
             </div>
           </div>
@@ -204,10 +344,13 @@ const NakshatraPrediction = () => {
                   </h3>
                   <div className="bg-white bg-opacity-70 rounded-lg p-4 text-center">
                     <h2 className="text-xl font-bold text-gray-800 mb-2 md:text-lg">
-                      {nakshatraData.birth_moon_nakshatra} Nakshatra
+                      {nakshatraData.birth_moon_nakshatra} {language === 'english' ? translations.nakshatra.english : translations.nakshatra.hindi}
                     </h2>
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      Your birth star is {nakshatraData.birth_moon_nakshatra} Nakshatra and is associated with the deity Vishvadevas
+                      {language === 'english' 
+                        ? `Your birth star is ${nakshatraData.birth_moon_nakshatra} Nakshatra and is associated with the deity Vishvadevas`
+                        : `आपका जन्म नक्षत्र ${nakshatraData.birth_moon_nakshatra} नक्षत्र है और यह देवता विश्वदेव से जुड़ा हुआ है`
+                      }
                     </p>
                   </div>
                 </div>
@@ -217,7 +360,7 @@ const NakshatraPrediction = () => {
                   <div className="w-full max-w-xs mx-auto mb-4">
                     <img 
                       src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/nak_deity/vishvadevas.png"
-                      alt="Vishvadevas - Universal Gods"
+                      alt={language === 'english' ? "Vishvadevas - Universal Gods" : "विश्वदेव - सार्वभौमिक देवता"}
                       className="w-full h-auto object-contain rounded-lg shadow-lg"
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -226,7 +369,9 @@ const NakshatraPrediction = () => {
                     />
                     <div className="hidden bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg p-8 border-2 border-yellow-200">
                       <div className="text-6xl mb-4">🕉️</div>
-                      <div className="text-sm text-gray-600">Vishvadevas</div>
+                      <div className="text-sm text-gray-600">
+                        {language === 'english' ? translations.vishvadevas.english : translations.vishvadevas.hindi}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -235,12 +380,10 @@ const NakshatraPrediction = () => {
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-300 mb-6">
                   <div className="bg-white bg-opacity-70 rounded-lg p-4">
                     <p className="text-base text-gray-700 leading-relaxed text-center md:text-sm">
-                      Hello {nakshatraData.birth_moon_nakshatra} Nakshatra! You were born between 26°40' 
-                      Sagittarius to 10°00' Capricorn, and you're ruled by the planet Sun. 
-                      Your Nakshatra is associated with Vishvadevas, the universal gods, 
-                      and it is symbolized by the tusk of an elephant, which represents 
-                      strength, power, and wisdom. You are a natural leader and possess 
-                      a strong sense of purpose.
+                      {language === 'english' 
+                        ? `Hello ${nakshatraData.birth_moon_nakshatra} Nakshatra! You were born between 26°40' Sagittarius to 10°00' Capricorn, and you're ruled by the planet Sun. Your Nakshatra is associated with Vishvadevas, the universal gods, and it is symbolized by the tusk of an elephant, which represents strength, power, and wisdom. You are a natural leader and possess a strong sense of purpose.`
+                        : `${translations.helloNakshatra.hindi} ${nakshatraData.birth_moon_nakshatra} ${translations.nakshatra.hindi}! ${translations.bornBetween.hindi} 26°40' धनु से 10°00' मकर, ${translations.ruledByPlanet.hindi} सूर्य। ${translations.associatedWith.hindi} ${translations.vishvadevas.hindi}, ${translations.universalGods.hindi}, ${translations.symbolizedBy.hindi}`
+                      }
                     </p>
                   </div>
                 </div>
@@ -253,13 +396,10 @@ const NakshatraPrediction = () => {
                   </h3>
                   <div className="bg-white bg-opacity-70 rounded-lg p-4">
                     <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                      As a {nakshatraData.birth_moon_nakshatra}, you have a strong and dynamic 
-                      personality. You possess a natural charisma and leadership 
-                      abilities that inspire others to follow you. You are ambitious 
-                      and goal-oriented, and you have a strong sense of purpose in 
-                      life. You are also deeply spiritual and seek to understand the 
-                      meaning and purpose of existence. You have a sharp mind 
-                      and an analytical approach to problem-solving.
+                      {language === 'english' 
+                        ? `As a ${nakshatraData.birth_moon_nakshatra}, you have a strong and dynamic personality. You possess a natural charisma and leadership abilities that inspire others to follow you. You are ambitious and goal-oriented, and you have a strong sense of purpose in life. You are also deeply spiritual and seek to understand the meaning and purpose of existence. You have a sharp mind and an analytical approach to problem-solving.`
+                        : `${translations.personalityDescription.hindi} ${nakshatraData.birth_moon_nakshatra}${translations.personalityDescription2.hindi}`
+                      }
                     </p>
                   </div>
                 </div>

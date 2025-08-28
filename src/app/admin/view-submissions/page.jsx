@@ -9,6 +9,7 @@ export default function ViewSubmissions() {
   const [filter, setFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({});
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchSubmissions();
@@ -16,6 +17,7 @@ export default function ViewSubmissions() {
 
   const fetchSubmissions = async () => {
     setLoading(true);
+    setError('');
     try {
       const params = new URLSearchParams({
         page: currentPage,
@@ -25,12 +27,19 @@ export default function ViewSubmissions() {
       });
 
       const response = await fetch(`/api/admin/kundli-submissions?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
+      
       const data = await response.json();
       
       setSubmissions(data.users);
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching submissions:", error);
+      setError('Failed to load submissions. Please try again.');
+      setSubmissions([]);
     } finally {
       setLoading(false);
     }
@@ -119,6 +128,20 @@ export default function ViewSubmissions() {
         <div style={{ marginBottom: "20px" }}>
           <p>Showing {submissions.length} of {pagination.total || 0} submissions</p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div style={{ 
+            padding: "15px", 
+            marginBottom: "20px", 
+            backgroundColor: "#f8d7da", 
+            color: "#721c24", 
+            borderRadius: "5px", 
+            border: "1px solid #f5c6cb" 
+          }}>
+            <p>{error}</p>
+          </div>
+        )}
 
         {/* Submissions Table */}
         {loading ? (
@@ -213,7 +236,7 @@ export default function ViewSubmissions() {
           </div>
         )}
 
-        {/* Pagination */}
+        {/* Pagination Controls */}
         {pagination.totalPages > 1 && (
           <div style={{
             display: "flex",
@@ -222,15 +245,20 @@ export default function ViewSubmissions() {
             marginTop: "20px"
           }}>
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
+              onClick={() => {
+                const newPage = Math.max(1, currentPage - 1);
+                setCurrentPage(newPage);
+                // Fetch with updated page
+                setTimeout(() => fetchSubmissions(), 0);
+              }}
+              disabled={currentPage === 1 || loading}
               style={{
                 padding: "8px 16px",
-                background: currentPage === 1 ? "#ccc" : "#007bff",
+                background: currentPage === 1 || loading ? "#ccc" : "#007bff",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: currentPage === 1 ? "not-allowed" : "pointer"
+                cursor: currentPage === 1 || loading ? "not-allowed" : "pointer"
               }}
             >
               Previous
@@ -241,15 +269,20 @@ export default function ViewSubmissions() {
             </span>
             
             <button
-              onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
-              disabled={currentPage === pagination.totalPages}
+              onClick={() => {
+                const newPage = Math.min(pagination.totalPages, currentPage + 1);
+                setCurrentPage(newPage);
+                // Fetch with updated page
+                setTimeout(() => fetchSubmissions(), 0);
+              }}
+              disabled={currentPage === pagination.totalPages || loading}
               style={{
                 padding: "8px 16px",
-                background: currentPage === pagination.totalPages ? "#ccc" : "#007bff",
+                background: currentPage === pagination.totalPages || loading ? "#ccc" : "#007bff",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: currentPage === pagination.totalPages ? "not-allowed" : "pointer"
+                cursor: currentPage === pagination.totalPages || loading ? "not-allowed" : "pointer"
               }}
             >
               Next
@@ -259,4 +292,4 @@ export default function ViewSubmissions() {
       </div>
     </div>
   );
-} 
+}
