@@ -306,6 +306,27 @@ export default function ViewUsers() {
                     color: "#667eea",
                     fontWeight: "bold",
                     fontSize: "16px"
+                  }}>Latitude</th>
+                  <th style={{ 
+                    padding: "20px 15px", 
+                    textAlign: "left", 
+                    color: "#667eea",
+                    fontWeight: "bold",
+                    fontSize: "16px"
+                  }}>Longitude</th>
+                  <th style={{ 
+                    padding: "20px 15px", 
+                    textAlign: "left", 
+                    color: "#667eea",
+                    fontWeight: "bold",
+                    fontSize: "16px"
+                  }}>Timezone</th>
+                  <th style={{ 
+                    padding: "20px 15px", 
+                    textAlign: "left", 
+                    color: "#667eea",
+                    fontWeight: "bold",
+                    fontSize: "16px"
                   }}>Mobile</th>
                   <th style={{ 
                     padding: "20px 15px", 
@@ -350,6 +371,9 @@ export default function ViewUsers() {
                     <td style={{ padding: "15px" }}>
                       {user.birthCity}, {user.birthCountry}
                     </td>
+                    <td style={{ padding: "15px" }}>{user.latitude || "-"}</td>
+                    <td style={{ padding: "15px" }}>{user.longitude || "-"}</td>
+                    <td style={{ padding: "15px" }}>{user.timezone || "5.5"}</td>
                     <td style={{ padding: "15px" }}>{user.mobile || "-"}</td>
                     <td style={{ padding: "15px" }}>
                       {user.email || "Not provided"}
@@ -534,4 +558,4 @@ export default function ViewUsers() {
       `}</style>
     </div>
   );
-} 
+}

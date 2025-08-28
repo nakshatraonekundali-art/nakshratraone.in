@@ -16,7 +16,10 @@ export async function POST(req) {
       birthPlace,
       email,
       planId,
-      mobile 
+      mobile,
+      latitude,
+      longitude,
+      timezone 
     } = body;
 
     // Validation
@@ -46,6 +49,9 @@ export async function POST(req) {
         birthCity: finalBirthCity,
         email: email || null,
         mobile,
+        latitude: latitude || null,
+        longitude: longitude || null,
+        timezone: timezone || 5.5,
       },
     });
 
@@ -77,4 +83,4 @@ export async function POST(req) {
     console.error('Error in kundli submission:', error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
-} 
+}

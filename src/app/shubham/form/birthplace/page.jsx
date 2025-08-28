@@ -302,6 +302,86 @@ const BirthPlace = () => {
     'Malerkotla, Punjab, India'
   ];
 
+  // Function to get coordinates for a city
+  const getCityCoordinates = (cityString) => {
+    // Default coordinates (Delhi)
+    let lat = 28.6139;
+    let lon = 77.2090;
+    let tzone = 5.5;
+    
+    // Map of city coordinates
+    const cityCoordinates = {
+      'Delhi': { lat: 28.6139, lon: 77.2090, tzone: 5.5 },
+      'New Delhi': { lat: 28.6139, lon: 77.2090, tzone: 5.5 },
+      'Mumbai': { lat: 19.0760, lon: 72.8777, tzone: 5.5 },
+      'Bangalore': { lat: 12.9716, lon: 77.5946, tzone: 5.5 },
+      'Chennai': { lat: 13.0827, lon: 80.2707, tzone: 5.5 },
+      'Hyderabad': { lat: 17.3850, lon: 78.4867, tzone: 5.5 },
+      'Kolkata': { lat: 22.5726, lon: 88.3639, tzone: 5.5 },
+      'Pune': { lat: 18.5204, lon: 73.8567, tzone: 5.5 },
+      'Ahmedabad': { lat: 23.0225, lon: 72.5714, tzone: 5.5 },
+      'Jaipur': { lat: 26.9124, lon: 75.7873, tzone: 5.5 },
+      'Surat': { lat: 21.1702, lon: 72.8311, tzone: 5.5 },
+      'Lucknow': { lat: 26.8467, lon: 80.9462, tzone: 5.5 },
+      'Kanpur': { lat: 26.4499, lon: 80.3319, tzone: 5.5 },
+      'Nagpur': { lat: 21.1458, lon: 79.0882, tzone: 5.5 },
+      'Indore': { lat: 22.7196, lon: 75.8577, tzone: 5.5 },
+      'Thane': { lat: 19.2183, lon: 72.9781, tzone: 5.5 },
+      'Bhopal': { lat: 23.2599, lon: 77.4126, tzone: 5.5 },
+      'Visakhapatnam': { lat: 17.6868, lon: 83.2185, tzone: 5.5 },
+      'Patna': { lat: 25.5941, lon: 85.1376, tzone: 5.5 },
+      'Vadodara': { lat: 22.3072, lon: 73.1812, tzone: 5.5 },
+      'Ghaziabad': { lat: 28.6654, lon: 77.4391, tzone: 5.5 },
+      'Ludhiana': { lat: 30.9010, lon: 75.8573, tzone: 5.5 },
+      'Agra': { lat: 27.1767, lon: 78.0081, tzone: 5.5 },
+      'Nashik': { lat: 19.9975, lon: 73.7898, tzone: 5.5 },
+      'Faridabad': { lat: 28.4089, lon: 77.3178, tzone: 5.5 },
+      'Meerut': { lat: 28.9845, lon: 77.7064, tzone: 5.5 },
+      'Rajkot': { lat: 22.3039, lon: 70.8022, tzone: 5.5 },
+      'Kalyan-Dombivali': { lat: 19.2350, lon: 73.1299, tzone: 5.5 },
+      'Vasai-Virar': { lat: 19.4250, lon: 72.8223, tzone: 5.5 },
+      'Varanasi': { lat: 25.3176, lon: 82.9739, tzone: 5.5 },
+      'Srinagar': { lat: 34.0837, lon: 74.7973, tzone: 5.5 },
+      'Aurangabad': { lat: 19.8762, lon: 75.3433, tzone: 5.5 },
+      'Dhanbad': { lat: 23.7957, lon: 86.4304, tzone: 5.5 },
+      'Amritsar': { lat: 31.6340, lon: 74.8723, tzone: 5.5 },
+      'Navi Mumbai': { lat: 19.0330, lon: 73.0297, tzone: 5.5 },
+      'Allahabad': { lat: 25.4358, lon: 81.8463, tzone: 5.5 },
+      'Ranchi': { lat: 23.3441, lon: 85.3096, tzone: 5.5 },
+      'Howrah': { lat: 22.5958, lon: 88.2636, tzone: 5.5 },
+      'Coimbatore': { lat: 11.0168, lon: 76.9558, tzone: 5.5 },
+      'Jabalpur': { lat: 23.1815, lon: 79.9864, tzone: 5.5 },
+      'Gwalior': { lat: 26.2183, lon: 78.1828, tzone: 5.5 },
+      'Vijayawada': { lat: 16.5062, lon: 80.6480, tzone: 5.5 },
+      'Jodhpur': { lat: 26.2389, lon: 73.0243, tzone: 5.5 },
+      'Madurai': { lat: 9.9252, lon: 78.1198, tzone: 5.5 },
+      'Raipur': { lat: 21.2514, lon: 81.6296, tzone: 5.5 },
+      'Kota': { lat: 25.2138, lon: 75.8648, tzone: 5.5 },
+      'Guwahati': { lat: 26.1833, lon: 91.7462, tzone: 5.5 },
+      'Chandigarh': { lat: 30.7333, lon: 76.7794, tzone: 5.5 },
+      'Solapur': { lat: 17.6599, lon: 75.9064, tzone: 5.5 },
+      'Hubli-Dharwad': { lat: 15.3647, lon: 75.1240, tzone: 5.5 },
+      'Bareilly': { lat: 28.3670, lon: 79.4304, tzone: 5.5 },
+      'Moradabad': { lat: 28.8389, lon: 78.7738, tzone: 5.5 },
+      'Mysore': { lat: 12.2958, lon: 76.6394, tzone: 5.5 },
+      'Gurgaon': { lat: 28.4595, lon: 77.0266, tzone: 5.5 },
+      'Aligarh': { lat: 27.8974, lon: 78.0880, tzone: 5.5 },
+      'Jalandhar': { lat: 31.3260, lon: 75.5762, tzone: 5.5 }
+    };
+    
+    // Extract city name from the full string (e.g., "Mumbai, Maharashtra, India" -> "Mumbai")
+    const cityParts = cityString.split(',');
+    const cityName = cityParts[0].trim();
+    
+    // Look up coordinates for the city
+    if (cityCoordinates[cityName]) {
+      return cityCoordinates[cityName];
+    }
+    
+    // Return default coordinates if city not found
+    return { lat, lon, tzone };
+  };
+
   const searchCities = (query) => {
     if (!query.trim()) {
       setSuggestions([]);
@@ -340,7 +420,22 @@ const BirthPlace = () => {
 
   const handleSuggestionClick = (suggestion) => {
     setCity(suggestion);
-    updateFormData({ city: suggestion });
+    
+    // Extract city and country from suggestion
+    const parts = suggestion.split(',').map(part => part.trim());
+    const cityName = parts[0];
+    
+    // Get coordinates for the selected city
+    const coordinates = getCityCoordinates(suggestion);
+    
+    // Update form data with city and coordinates
+    updateFormData({ 
+      city: suggestion,
+      latitude: coordinates.lat,
+      longitude: coordinates.lon,
+      timezone: coordinates.tzone
+    });
+    
     setShowSuggestions(false);
     setSuggestions([]);
   };
@@ -349,8 +444,20 @@ const BirthPlace = () => {
     // Delay hiding suggestions to allow clicking
     setTimeout(() => {
       setShowSuggestions(false);
-      // Update formData when focus is lost
-      updateFormData({ country, city });
+      
+      // Get coordinates for the current city
+      if (city) {
+        const coordinates = getCityCoordinates(city);
+        
+        // Update formData when focus is lost
+        updateFormData({ 
+          country, 
+          city,
+          latitude: coordinates.lat,
+          longitude: coordinates.lon,
+          timezone: coordinates.tzone
+        });
+      }
     }, 150);
   };
 

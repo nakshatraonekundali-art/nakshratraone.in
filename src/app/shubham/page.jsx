@@ -1,4 +1,3 @@
-
 'use client'
 import Link from 'next/link';
 import React from 'react';
@@ -8,7 +7,12 @@ const Select_Language = () => {
   const { setLanguageDirectly } = useKundli();
   
   const handleLanguageSelect = (language) => {
+    console.log('Language selected:', language);
     setLanguageDirectly(language);
+    // Small delay to ensure context is updated before navigation
+    setTimeout(() => {
+      console.log('Navigating to form with language:', language);
+    }, 100);
   };
   
   return (
@@ -54,12 +58,9 @@ const Select_Language = () => {
 
         {/* Language Selection */}
         <div className="mb-6">
-           
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-           
-  Select your language for free kundli analysis.
+            Select your language for free kundli analysis.
           </h3>
-        
           <p className="text-gray-700 mb-6 text-center">
             मुफ्त कुंडली विश्लेषण के लिए अपनी भाषा चुनें।
           </p>
@@ -67,25 +68,29 @@ const Select_Language = () => {
 
         {/* Language Buttons */}
         <div className="space-y-3">
-          <button 
-            onClick={() => handleLanguageSelect('english')}
-            className="w-full bg-white border-2 border-gray-300 rounded-lg py-3 px-4 text-gray-700 font-medium hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 flex items-center justify-between group"
-          >
-            <Link href="/shubham/form">View in English</Link>
-            <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <Link href="/shubham/form">
+            <button 
+              onClick={() => handleLanguageSelect('english')}
+              className="w-full bg-white border-2 border-gray-300 rounded-lg py-3 px-4 text-gray-700 font-medium hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 flex items-center justify-between group"
+            >
+              <span>View in English</span>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </Link>
           
-          <button 
-            onClick={() => handleLanguageSelect('hindi')}
-            className="w-full bg-white border-2 border-gray-300 rounded-lg py-3 px-4 text-gray-700 font-medium hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 flex items-center justify-between group"
-          >
-            <Link href="/shubham/form">हिंदी में देखें</Link>
-            <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <Link href="/shubham/form">
+            <button 
+              onClick={() => handleLanguageSelect('hindi')}
+              className="w-full bg-white border-2 border-gray-300 rounded-lg py-3 px-4 text-gray-700 font-medium hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 flex items-center justify-between group"
+            >
+              <span>हिंदी में देखें</span>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </Link>
         </div>
       </div>
     </div>

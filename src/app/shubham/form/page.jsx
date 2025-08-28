@@ -143,8 +143,8 @@ const Form = () => {
                 ))}
               </select>
               <select
-                value={formData.minute}
-                onChange={(e) => handleInputChange('minute', e.target.value)}
+                value={formData.min}
+                onChange={(e) => handleInputChange('min', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
               >
                 {minutes.map((minute, index) => (
@@ -261,8 +261,8 @@ const Form = () => {
                 ))}
               </select>
               <select
-                value={formData.minute}
-                onChange={(e) => handleInputChange('minute', e.target.value)}
+                value={formData.min}
+                onChange={(e) => handleInputChange('min', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 bg-white"
               >
                 {minutes.map((minute, index) => (

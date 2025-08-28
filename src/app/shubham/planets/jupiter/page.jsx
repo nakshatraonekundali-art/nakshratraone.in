@@ -15,7 +15,11 @@ const JupiterAnalysis = () => {
     error: language === 'hindi' ? 'डेटा लोड करने में त्रुटि' : 'Error Loading Data',
     retry: language === 'hindi' ? 'पुनः प्रयास करें' : 'Retry',
     next: language === 'hindi' ? 'अगला →' : 'Next →',
-    back: language === 'hindi' ? 'वापस' : 'Back'
+    back: language === 'hindi' ? 'वापस' : 'Back',
+    jupiterTitle: language === 'hindi' ? 'बृहस्पति (गुरु)' : 'Brihaspati (Jupiter)',
+    jupiterDesc: language === 'hindi' 
+      ? "बृहस्पति, जिसे गुरु भी कहते हैं, बुद्धि और ज्ञान का ग्रह है। संस्कृत में इसे 'देवगुरु' कहा जाता है, जिसका अर्थ है आध्यात्मिक शिक्षक। बृहस्पति उदारता और रचनात्मकता के लिए जाना जाता है।"
+      : "Brihaspati, also known as Guru, is the planet of wisdom and knowledge. In Sanskrit, it's called 'Devaguru,' meaning the spiritual teacher. Brihaspati is known for generosity and creativity, representing our spiritual purpose in life."
   };
 
   // API configuration
@@ -26,7 +30,7 @@ const JupiterAnalysis = () => {
     api: 'general_house_report/jupiter'
   };
 
-  // Map language to API language parameter
+  // Map language to API language parameter (based on your working test)
   const apiLanguage = language === 'hindi' ? 'hi' : 'en';
    
   // Use birth details from context or fallback to defaults
@@ -50,9 +54,10 @@ const JupiterAnalysis = () => {
   // Function to simulate Jupiter data if API fails (fallback)
   const loadFallbackData = () => {
     const fallbackData = {
+      planet: language === 'hindi' ? 'गुरु' : 'Jupiter',
       house_report: language === 'hindi' 
-        ? "बृहस्पति ग्रह आपकी जन्म कुंडली में वृषभ राशि के रोहिणी नक्षत्र में 6वें भाव में स्थित है। यह स्थिति आपको स्वास्थ्य के मामलों में बुद्धिमत्ता, सेवा भावना, और कार्यक्षेत्र में न्याय की प्रवृत्ति प्रदान करती है। आप एक प्राकृतिक चिकित्सक और समस्या समाधानकर्ता हैं। आपमें दूसरों की सहायता करने की प्रबल इच्छा है और आप अपने कार्यक्षेत्र में धर्म और नैतिकता के सिद्धांतों का पालन करते हैं। यह स्थिति आपको विनम्रता, व्यावहारिकता और सेवा के माध्यम से आध्यात्मिक विकास का मार्ग दिखाती है। आपके शत्रु आपके सामने नहीं टिक सकते और आप कानूनी मामलों में सफलता प्राप्त करते हैं। स्वास्थ्य संबंधी चुनौतियों से बचने के लिए नियमित दिनचर्या अपनाएं।"
-        : "Jupiter is positioned in the 6th house of your birth chart in Taurus sign under Rohini nakshatra. This placement gives you wisdom in health matters, a spirit of service, and a tendency toward justice in your work sphere. You are a natural healer and problem solver. You have a strong desire to help others and follow principles of dharma and ethics in your workplace. This position shows you the path of spiritual development through humility, practicality, and service. Your enemies cannot stand before you, and you achieve success in legal matters. You excel in competitive environments and have the ability to overcome obstacles through patience and perseverance. Adopt a regular routine to avoid health-related challenges."
+        ? "आप का दिमाग बहुत तेज है। आप आध्यात्मिक और दार्शनिक प्रकृति के व्यक्ति हैं। आप अत्यंत सहनशील हैं और राज़ बनाए रखने में सक्षम हैं। आप अपनी वाक्शक्ति द्वारा दूसरों को अपनी बात के लिए राज़ी करने में समर्थ हैं। शत्रु किसी भी तरह से आपको नुकसान नहीं पहुंचा सकते हैं। आप सही अर्थों में एक संतुष्ट जीवन जीयेंगें।"
+        : "Jupiter is positioned in the 6th house of your birth chart in Taurus sign under Rohini nakshatra. This placement gives you wisdom in health matters, a spirit of service, and a tendency toward justice in your work sphere. You are a natural healer and problem solver. You have a strong desire to help others and follow principles of dharma and ethics in your workplace. Your enemies cannot stand before you, and you achieve success in legal matters."
     };
     
     console.log('Loading fallback Jupiter data:', fallbackData);
@@ -65,97 +70,93 @@ const JupiterAnalysis = () => {
       setLoading(true);
       setError(''); // Clear previous errors
       
-      // Validate birth details first
+      // Validate birth details first and ensure they are numbers
       const safeDetails = {
-        day: birthDetails?.day || 6,
-        month: birthDetails?.month || 1,
-        year: birthDetails?.year || 2000,
-        hour: birthDetails?.hour || 7,
-        min: birthDetails?.min || 45,
-        lat: birthDetails?.lat || 19.132,
-        lon: birthDetails?.lon || 72.342,
-        tzone: birthDetails?.tzone || 5.5
+        day: parseInt(birthDetails?.day) || 6,
+        month: parseInt(birthDetails?.month) || 1,
+        year: parseInt(birthDetails?.year) || 2000,
+        hour: parseInt(birthDetails?.hour) || 7,
+        min: parseInt(birthDetails?.min) || 45,
+        lat: parseFloat(birthDetails?.lat) || 19.132,
+        lon: parseFloat(birthDetails?.lon) || 72.342,
+        tzone: parseFloat(birthDetails?.tzone) || 5.5
       };
       
       console.log('Birth details being used:', safeDetails);
+      console.log('API Language:', apiLanguage);
       
-      // For now, let's skip the API call and load demo data directly
-      // since the API is consistently returning 405 errors
-      console.log('API is not accessible, loading demo data...');
-      loadFallbackData();
-      return;
-      
-      // Commented out API call until endpoint is fixed
-      /*
-      // Create URL with query parameters for GET request
-      const queryParams = new URLSearchParams({
-        day: safeDetails.day.toString(),
-        month: safeDetails.month.toString(),
-        year: safeDetails.year.toString(),
-        hour: safeDetails.hour.toString(),
-        min: safeDetails.min.toString(),
-        lat: safeDetails.lat.toString(),
-        lon: safeDetails.lon.toString(),
-        tzone: safeDetails.tzone.toString(),
-        lang: apiLanguage
-      });
-
-      // Try POST request first (original method)
-      let response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
+      // Make API call using the working pattern from your test
+      const response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}`, {
         method: 'POST',
         headers: {
           'Authorization': getAuthHeader(),
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Language': apiLanguage
+          'Accept-Language': apiLanguage // This is the key based on your working test
         },
-        body: JSON.stringify(safeDetails)
+        body: JSON.stringify({
+          day: safeDetails.day,
+          month: safeDetails.month, 
+          year: safeDetails.year,
+          hour: safeDetails.hour,
+          min: safeDetails.min,
+          lat: safeDetails.lat,
+          lon: safeDetails.lon,
+          tzone: safeDetails.tzone
+          // Note: No 'lang' parameter in body, using Accept-Language header instead
+        })
       });
       
-      // If POST fails with 405, try GET request
-      if (response.status === 405) {
-        console.log('POST method not allowed, trying GET request...');
-        response = await fetch(`${API_CONFIG.baseUrl}/${API_CONFIG.api}?${queryParams}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': getAuthHeader(),
-            'Accept': 'application/json',
-            'Accept-Language': apiLanguage
-          }
-        });
-      }
+      console.log('API Response status:', response.status);
+      console.log('Request payload:', {
+        day: safeDetails.day,
+        month: safeDetails.month, 
+        year: safeDetails.year,
+        hour: safeDetails.hour,
+        min: safeDetails.min,
+        lat: safeDetails.lat,
+        lon: safeDetails.lon,
+        tzone: safeDetails.tzone,
+        'Accept-Language': apiLanguage
+      });
       
       if (!response.ok) {
-        // Provide more detailed error information
         let errorMessage = `API Error: ${response.status} - ${response.statusText}`;
         
         try {
           const errorData = await response.json();
           if (errorData.error || errorData.message) {
-            errorMessage += ` - ${errorData.error || errorData.message}`;
+            errorMessage += ` - ${JSON.stringify(errorData)}`;
           }
         } catch (e) {
-          // If error response is not JSON, use the basic error message
+          console.log('Error response is not JSON:', e);
         }
         
         throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Jupiter Data:', data);
+      console.log('Jupiter Data received from API:', data);
       
       // Validate the response data
       if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
         throw new Error('No data received from API');
       }
       
+      // Check if we have the expected structure
+      if (!data.house_report && !data.planet) {
+        console.warn('Unexpected API response structure:', data);
+        throw new Error('Invalid API response structure');
+      }
+      
       setJupiterData(data);
-      */
+      console.log('Jupiter data set successfully:', data);
       
     } catch (error) {
       console.error('Error fetching Jupiter data:', error);
+      setError(error.message);
       
-      // Auto-load demo data on any error
+      // Load fallback data on any error
+      console.log('Loading fallback data due to error:', error.message);
       loadFallbackData();
       
     } finally {
@@ -163,7 +164,7 @@ const JupiterAnalysis = () => {
     }
   };
 
-  // Fetch data on component mount
+  // Fetch data on component mount and when language changes
   useEffect(() => {
     console.log('useKundli context data:', { language, formData });
     console.log('Birth details:', birthDetails);
@@ -180,6 +181,18 @@ const JupiterAnalysis = () => {
     window.location.href = '/shubham/planets/venus';
   };
 
+  // Function to strip HTML tags from house_report
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '');
+  };
+
+  // Debug log to check current state
+  console.log('Current Jupiter data state:', jupiterData);
+  console.log('Loading state:', loading);
+  console.log('Error state:', error);
+  console.log('Current language:', language);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -191,7 +204,7 @@ const JupiterAnalysis = () => {
     );
   }
 
-  if (error) {
+  if (error && !jupiterData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-gray-50 rounded-lg p-8 shadow-xl max-w-md w-full">
@@ -250,19 +263,19 @@ const JupiterAnalysis = () => {
               </div>
               
               <h2 className="text-2xl font-bold text-gray-800 mb-4 md:text-xl md:mb-3">
-                {language === 'hindi' ? 'बृहस्पति (Jupiter)' : 'Brihaspati (Jupiter)'}
+                {translations.jupiterTitle}
               </h2>
               
               {/* Tags - Jupiter themed colors */}
               <div className="flex flex-wrap justify-center gap-2 mb-6 md:mb-4">
                 <span className="bg-rose-400 text-white px-4 py-2 rounded-full text-sm font-medium md:px-3 md:py-1 md:text-xs">
-                  Rohini
+                  {language === 'hindi' ? 'रोहिणी' : 'Rohini'}
                 </span>
                 <span className="bg-rose-400 text-white px-4 py-2 rounded-full text-sm font-medium md:px-3 md:py-1 md:text-xs">
-                  Taurus
+                  {language === 'hindi' ? 'वृषभ' : 'Taurus'}
                 </span>
                 <span className="bg-rose-400 text-white px-4 py-2 rounded-full text-sm font-medium md:px-3 md:py-1 md:text-xs">
-                  6 House
+                  {language === 'hindi' ? '6 भाव' : '6 House'}
                 </span>
               </div>
             </div>
@@ -270,10 +283,7 @@ const JupiterAnalysis = () => {
             {/* Description */}
             <div className="mb-6">
               <p className="text-base text-gray-700 leading-relaxed text-center px-2 md:text-sm">
-                {language === 'hindi' 
-                  ? "बृहस्पति, जिसे अंग्रेजी में जुपिटर कहते हैं, बुद्धि का ग्रह है। संस्कृत में इसे 'देवगुरु' कहा जाता है, जिसका अर्थ है आध्यात्मिक शिक्षक या मार्गदर्शक। बृहस्पति सहायक और उदार होने के लिए जाना जाता है, और यह रचनात्मकता से जुड़ा है।"
-                  : "Brihaspati, known as Jupiter in English, is the planet of wisdom. In Sanskrit, it's called 'Devaguru,' meaning the spiritual teacher or guide. Brihaspati is known for being helpful and generous, and it's associated with creativity. It represents our commitment and devotion, pointing to our spiritual purpose in life. Like all planets, Brihaspati's energies can be imbalanced and need proper balancing for true harmony."
-                }
+                {translations.jupiterDesc}
               </p>
             </div>
 
@@ -281,41 +291,10 @@ const JupiterAnalysis = () => {
             {jupiterData && jupiterData.house_report && (
               <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-4 border border-rose-300 mb-6">
                 <p className="text-base text-gray-700 leading-relaxed md:text-sm">
-                  {jupiterData.house_report}
+                  {stripHtmlTags(jupiterData.house_report)}
                 </p>
               </div>
             )}
-
-            {/* Kundli Breakdown Section - Jupiter themed */}
-            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200 mb-6">
-              <div className="mb-4 md:mb-3">
-                <button className="bg-gradient-to-r from-rose-400 to-orange-400 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-rose-500 md:text-xs">
-                  {language === 'hindi' ? 'गहरी कुंडली विश्लेषण' : 'IN-DEPTH KUNDLI BREAKDOWN'}
-                </button>
-              </div>
-              
-              <div className="flex items-start space-x-4 md:space-x-3">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
-                    {language === 'hindi' 
-                      ? "विस्तृत ग्रह विश्लेषण, भाव व्याख्या, और व्यक्तिगत अंतर्दृष्टि के साथ अपना संपूर्ण ज्योतिषीय खाका खोजें।"
-                      : "Discover your complete astrological blueprint with detailed planetary analysis, house interpretations, and personalized insights."
-                    }
-                  </p>
-                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
-                    {language === 'hindi' 
-                      ? "आपकी अनूठी जन्म कुंडली के आधार पर व्यापक जीवन भविष्यवाणियां, करियर मार्गदर्शन, और रिश्ते की अनुकूलता प्राप्त करें।"
-                      : "Get comprehensive life predictions, career guidance, and relationship compatibility based on your unique birth chart."
-                    }
-                  </p>
-                </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-yellow-600 to-orange-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {language === 'hindi' ? 'आपकी संपूर्ण कुंडली' : 'YOUR COMPLETE KUNDLI'}
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Bottom padding for scrolling */}
             <div className="h-4"></div>
