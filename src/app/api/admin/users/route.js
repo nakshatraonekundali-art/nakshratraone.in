@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgresql://postgres.msduudmjcwojdkurqtln:Om@123456789@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true';
+let prismaSingleton = null;
+
+function getPrismaClient() {
+  if (prismaSingleton) return prismaSingleton;
+  prismaSingleton = new PrismaClient();
+  return prismaSingleton;
 }
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
+    const prisma = getPrismaClient();
     const users = await prisma.user.findMany({
       orderBy: { createdAt: 'desc' }
     });
