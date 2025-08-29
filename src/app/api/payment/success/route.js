@@ -39,7 +39,7 @@ export async function POST(request) {
       // Generate the PDF server-side
       let pdfUrl = '';
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/pdf/generate`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/api/pdf/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userData: decoded.userData, planType: decoded.planType || productinfo })

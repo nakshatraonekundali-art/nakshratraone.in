@@ -50,8 +50,8 @@ export async function POST(request) {
       firstname: userData.name,
       email: userData.email || 'user@example.com',
       phone: userData.mobile || '9999999999',
-      surl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/success`,
-      furl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/failure`,
+      surl: `${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/api/payment/success`,
+      furl: `${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/api/payment/failure`,
       hash: hash,
       // Pass-through data so we can generate the PDF after success
       udf1
