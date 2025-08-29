@@ -38,18 +38,52 @@ export async function POST(request) {
 
       // Generate the PDF server-side
       let pdfUrl = '';
+      let pdfError = '';
+      
+      // Debug logging
+      console.log('Payment success - decoded data:', {
+        planType: decoded.planType,
+        productinfo,
+        hasUserData: !!decoded.userData,
+        userDataKeys: decoded.userData ? Object.keys(decoded.userData) : []
+      });
+      
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/api/pdf/generate`, {
+        if (!decoded.userData) {
+          throw new Error('No user data available for PDF generation');
+        }
+        
+        const pdfRequestData = { 
+          userData: decoded.userData, 
+          planType: decoded.planType || productinfo 
+        };
+        
+        console.log('Calling PDF generation with:', pdfRequestData);
+        
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+        const pdfApiUrl = `${baseUrl}/api/pdf/generate`;
+        
+        console.log('PDF generation URL:', pdfApiUrl);
+        
+        const res = await fetch(pdfApiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userData: decoded.userData, planType: decoded.planType || productinfo })
+          body: JSON.stringify(pdfRequestData)
         });
+        
+        console.log('PDF generation response status:', res.status);
+        
         const json = await res.json();
+        console.log('PDF generation response:', json);
+        
         if (json.success && json.pdf_url) {
           pdfUrl = json.pdf_url;
+        } else {
+          pdfError = json.message || 'PDF generation failed';
         }
       } catch (e) {
-        // fall through; we'll still show success page
+        console.error('PDF generation error:', e);
+        pdfError = e.message;
       }
 
       // Return an HTML page that triggers a download/open and then redirects
@@ -57,7 +91,19 @@ export async function POST(request) {
         <div style="max-width:640px;margin:80px auto;text-align:center;">
           <h1>Payment Successful</h1>
           <p>Transaction ID: ${txnid || ''}</p>
-          ${pdfUrl ? `<p>Your report is ready. Download should begin automatically. <a href="${pdfUrl}">Open PDF</a></p>` : `<p>Your report is being prepared.</p>`}
+          ${pdfUrl ? 
+            `<p>Your report is ready. Download should begin automatically. <a href="${pdfUrl}" target="_blank">Open PDF</a></p>` : 
+            pdfError ? 
+              `<p style="color: red;">PDF generation failed: ${pdfError}</p><p>Please contact support with Transaction ID: ${txnid}</p>` :
+              `<p>Your report is being prepared. Please wait...</p>`
+          }
+          <div style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; font-size: 12px; text-align: left;">
+            <strong>Debug Info:</strong><br>
+            Plan Type: ${decoded.planType || productinfo}<br>
+            Has User Data: ${decoded.userData ? 'Yes' : 'No'}<br>
+            ${decoded.userData ? `User Name: ${decoded.userData.name || 'N/A'}<br>` : ''}
+            ${pdfError ? `Error: ${pdfError}` : ''}
+          </div>
         </div>
         <script>
           (function(){
@@ -67,10 +113,12 @@ export async function POST(request) {
                 var a = document.createElement('a');
                 a.href = pdf; a.download = '';
                 document.body.appendChild(a); a.click();
-              } catch (e) {}
+              } catch (e) {
+                console.error('Download failed:', e);
+              }
               setTimeout(function(){ window.open(pdf, '_blank'); }, 300);
             }
-            setTimeout(function(){ window.location = '/shubham?payment=success'; }, 1200);
+            setTimeout(function(){ window.location = '/shubham?payment=success'; }, 3000);
           })();
         </script>
       </body></html>`;
