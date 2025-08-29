@@ -3,16 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql" // MySQL, SQLite, MongoDB me badal sakte ho
-  url      = env("DATABASE_URL")
+ provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Plan {
-  id          Int        @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   planName    String
   description String
   price       Int
-  userPlans   UserPlan[] // relation to UserPlan
+
+  userPlans   UserPlan[]
 }
 
 model Admin {
@@ -23,16 +25,21 @@ model Admin {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   name         String
   gender       String
   birthDate    DateTime
   birthTime    String
   birthCountry String
   birthCity    String
-  email        String?    @unique
+  email        String?  @unique
   mobile       String?
-  userPlans    UserPlan[] // relation to UserPlan
+  latitude     Float?
+  longitude    Float?
+  timezone     Float?
+  createdAt    DateTime @default(now())
+
+  userPlans    UserPlan[]
 }
 
 model UserPlan {

@@ -2,9 +2,11 @@
 import React from 'react';
 import { useKundli } from '../context/KundliContext';
 import Navigation from '../components/Navigation';
+import { useRouter } from 'next/navigation';
 
 const Form = () => {
   const { formData, updateFormData, language } = useKundli();
+  const router = useRouter();
 
   const handleInputChange = (field, value) => {
     updateFormData({ [field]: value });
@@ -71,7 +73,7 @@ const Form = () => {
 
         {/* Form */}
         <div className="space-y-6">
-          {/* Name and Gender Row */}
+          {/* Name, Mobile and Gender Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <input
@@ -92,6 +94,30 @@ const Form = () => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+          </div>
+
+          {/* Mobile and Email Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder={language === 'english' ? 'Mobile Number' : 'मोबाइल नंबर'}
+                value={formData.mobile}
+                onChange={(e) => handleInputChange('mobile', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                placeholder={language === 'english' ? 'Email (optional)' : 'ईमेल (वैकल्पिक)'}
+                value={formData.email || ''}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
             </div>
           </div>
 
@@ -160,8 +186,8 @@ const Form = () => {
               currentPage="form"
               nextText={language === 'english' ? translations.next.english : translations.next.hindi}
               backText={language === 'english' ? translations.back.english : translations.back.hindi}
-              onNext={() => window.location.href = '/shubham/form/birthplace'}
-              onBack={() => window.location.href = '/shubham'}
+              onNext={() => router.push('/shubham/form/birthplace')}
+              onBack={() => router.push('/shubham')}
             />
           </div>
         </div>
@@ -189,7 +215,7 @@ const Form = () => {
 
         {/* Form */}
         <div className="space-y-6">
-          {/* Name and Gender Row */}
+          {/* Name, Mobile and Gender Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <input
@@ -210,6 +236,30 @@ const Form = () => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+          </div>
+
+          {/* Mobile and Email Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder={language === 'english' ? 'Mobile Number' : 'मोबाइल नंबर'}
+                value={formData.mobile}
+                onChange={(e) => handleInputChange('mobile', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                placeholder={language === 'english' ? 'Email (optional)' : 'ईमेल (वैकल्पिक)'}
+                value={formData.email || ''}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+              />
             </div>
           </div>
 
@@ -278,8 +328,8 @@ const Form = () => {
               currentPage="form"
               nextText={language === 'english' ? translations.next.english : translations.next.hindi}
               backText={language === 'english' ? translations.back.english : translations.back.hindi}
-              onNext={() => window.location.href = '/shubham/form/birthplace'}
-              onBack={() => window.location.href = '/shubham'}
+              onNext={() => router.push('/shubham/form/birthplace')}
+              onBack={() => router.push('/shubham')}
             />
           </div>
         </div>

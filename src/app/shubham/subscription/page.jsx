@@ -1,21 +1,145 @@
 'use client'
 import React, { useState } from 'react';
+import { useKundli } from '../context/KundliContext';
+import { useRouter } from 'next/navigation';
 
 const SubscriptionComponent = () => {
+  const { formData, language } = useKundli();
+  const router = useRouter();
   const [selectedOffer, setSelectedOffer] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleOfferSelect = (offerType) => {
-    setSelectedOffer(offerType);
-    console.log(`Selected offer: ${offerType}`);
+  const isProfileComplete = () => {
+    return !!(
+      formData?.name &&
+      formData?.gender &&
+      formData?.city &&
+      formData?.country
+    );
+  };
+
+  const plans = {
+    mini: { name: 'Mini Horoscope', price: 1, color: 'yellow' },
+    basic: { name: 'Basic Horoscope', price: 5, color: 'blue' },
+    professional: { name: 'Professional Horoscope', price: 50, color: 'purple' }
+  };
+
+  const handleOfferSelect = async (planType) => {
+    try {
+      setLoading(true);
+      setError('');
+      setSelectedOffer(planType);
+
+      // Validate user data
+      if (!isProfileComplete()) {
+        setError('Please complete your profile first. Redirecting you to the profile form...');
+        setLoading(false);
+        router.push('/shubham/form');
+        return;
+      }
+
+      const plan = plans[planType];
+      
+      // Generate unique transaction ID
+      const txnid = `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Prepare user data for payment
+      const userData = {
+        name: formData.name,
+        email: formData.email || 'user@example.com',
+        mobile: formData.mobile || '9999999999',
+        gender: formData.gender,
+        day: formData.day,
+        month: formData.month,
+        year: formData.year,
+        hour: formData.hour,
+        min: formData.min,
+        city: formData.city,
+        country: formData.country,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        timezone: formData.timezone,
+        language: language
+      };
+
+      // Initiate payment
+      const paymentResponse = await fetch('/api/payment/payu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: plan.price,
+          planType: planType,
+          userData: userData,
+          txnid: txnid
+        }),
+      });
+
+      const paymentResult = await paymentResponse.json();
+
+      if (!paymentResult.success) {
+        throw new Error(paymentResult.message || 'Payment initiation failed');
+      }
+
+      // Submit the user to PayU gateway using an auto-submitting form
+      const { paymentUrl, paymentData } = paymentResult;
+      if (!paymentUrl || !paymentData) {
+        throw new Error('Invalid payment initialization response');
+      }
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = paymentUrl;
+      form.style.display = 'none';
+
+      Object.entries(paymentData).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = String(value ?? '');
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+
+    } catch (err) {
+      console.error('Payment/PDF error:', err);
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getButtonClass = (planType) => {
+    const plan = plans[planType];
+    const baseClass = "w-full font-bold py-3 px-4 rounded-xl mt-3 transition-all duration-200 flex items-center justify-center md:py-2 md:text-sm";
+    
+    if (loading && selectedOffer === planType) {
+      return `${baseClass} bg-gray-400 text-white cursor-not-allowed`;
+    }
+    
+    switch (plan.color) {
+      case 'yellow':
+        return `${baseClass} bg-yellow-400 hover:bg-yellow-500 text-yellow-900`;
+      case 'blue':
+        return `${baseClass} bg-blue-400 hover:bg-blue-500 text-white`;
+      case 'purple':
+        return `${baseClass} bg-purple-400 hover:bg-purple-500 text-white`;
+      default:
+        return `${baseClass} bg-gray-400 text-white`;
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white md:bg-gradient-to-br md:from-purple-800 md:via-purple-600 md:to-purple-400 md:flex md:items-center md:justify-center md:p-4">
+    <div className="h-screen overflow-hidden bg-white md:bg-gradient-to-br md:from-purple-800 md:via-purple-600 md:to-purple-400 md:flex md:items-center md:justify-center md:p-4">
       {/* Mobile: Full width, Desktop: Centered card */}
-      <div className="w-full max-w-full mx-auto md:max-w-lg">
-        <div className="bg-gradient-to-b from-gray-50 via-blue-50 to-purple-50 min-h-screen md:min-h-0 flex flex-col md:rounded-3xl md:shadow-2xl md:overflow-hidden md:h-[95vh]">
+      <div className="w-full max-w-full mx-auto md:max-w-lg h-full">
+        <div className="bg-gradient-to-b from-gray-50 via-blue-50 to-purple-50 h-full flex flex-col md:rounded-3xl md:shadow-2xl md:overflow-hidden">
           
-          {/* Header with VEDICrishi branding */}
+          {/* Header with NakshatraOne branding */}
           <div className="text-center pt-8 pb-6 px-6 flex-shrink-0 md:pt-6 md:pb-4">
             <div className="flex items-center justify-center mb-6 md:mb-3">
               <span className="text-orange-500 text-xl font-bold md:text-lg">Nakshatra</span>
@@ -23,49 +147,72 @@ const SubscriptionComponent = () => {
             </div>
             
             <h1 className="text-xl font-bold text-gray-800 mb-2 md:text-lg">
-              Here is what we have prepared for you.
+              {language === 'hindi' ? 'अपनी परफेक्ट योजना चुनें' : 'Choose Your Perfect Plan'}
             </h1>
             
             <p className="text-gray-600 text-sm mb-4 md:text-xs">
-              Check Out These Personalized Reports For You
+              {language === 'hindi' ? 'हमारी किफायती ज्योतिष रिपोर्ट्स में से चुनें' : 'Select from our affordable astrology reports'}
             </p>
             
             <p className="text-gray-700 text-sm leading-relaxed md:text-xs">
-              Our Principal Astrologer has prepared two unique reports specifically for you: 
-              <span className="font-semibold"> the Premium Kundli Report</span> and 
-              <span className="font-semibold"> the Yearly Varshphal Report</span>. 
-              These reports offer valuable, personalized guidance to help you navigate your future.
+              {language === 'hindi' 
+                ? 'हमारी सावधानी से तैयार की गई रिपोर्ट्स के साथ व्यक्तिगत ज्योतिषीय जानकारियाँ पाएं। अपनी जरूरत और बजट के अनुसार योजना चुनें।'
+                : 'Get personalized astrological insights with our carefully crafted reports. Choose the plan that suits your needs and budget.'}
             </p>
           </div>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto px-6 pb-6 md:scrollbar-thin md:scrollbar-thumb-gray-300 md:scrollbar-track-transparent">
+          {/* Error / Info Message */}
+          {error && (
+            <div className="mx-6 mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          {!error && !isProfileComplete() && (
+            <div className="mx-6 mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+              Your profile is incomplete. Please fill the form to continue.{' '}
+              <button onClick={() => router.push('/shubham/form')} className="underline font-medium">Complete Profile</button>
+            </div>
+          )}
+
+          {/* Content Area (card scrollable) */}
+          <div className="flex-1 px-6 pb-6 overflow-y-auto">
           
-            {/* Your Abundance Report */}
+            {/* Mini Horoscope - ₹1 */}
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 mb-4 border border-yellow-200">
               <div className="flex items-start space-x-4 md:space-x-3">
                 <div className="flex-1">
-                  <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">Your Abundance Report</h2>
+                  <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">{language === 'hindi' ? 'मिनी राशिफल' : 'Mini Horoscope'}</h2>
                   
                   <p className="text-sm text-gray-700 mb-2 md:text-xs">
-                    Get a bespoke <span className="font-semibold text-blue-600">Astro-Vastu blueprint</span> that highlights your home's high-impact 
-                    <span className="font-semibold text-green-600"> money zones</span>, provides easy 
-                    <span className="font-semibold text-purple-600"> color, pattern</span>, and 
-                    <span className="font-semibold text-red-600"> clutter remedies</span>, and includes potent prosperity mantras.
+                    {language === 'hindi' ? (
+                      <>
+                        अपनी दैनिक ज्योतिषीय जानकारी की एक त्वरित झलक पाएं। यह 
+                        <span className="font-semibold text-blue-600"> संक्षिप्त रिपोर्ट</span> आवश्यक 
+                        <span className="font-semibold text-green-600"> दैनिक भविष्यवाणियाँ</span> और 
+                        <span className="font-semibold text-purple-600"> मार्गदर्शन</span> प्रदान करती है।
+                      </>
+                    ) : (
+                      <>
+                        Get a quick glimpse into your daily astrological insights. This 
+                        <span className="font-semibold text-blue-600"> concise report</span> provides essential 
+                        <span className="font-semibold text-green-600"> daily predictions</span> and 
+                        <span className="font-semibold text-purple-600"> guidance</span> for your day ahead.
+                      </>
+                    )}
                   </p>
                   
                   <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                    Get this report for ₹999 ₹599
+                    {language === 'hindi' ? 'सिर्फ ₹1 प्रति PDF' : 'Only ₹1 Per PDF'}
                   </div>
                   <div className="text-xs text-gray-600 md:text-[10px]">
-                    (Save ₹400 - 40% OFF )
+                    Most Affordable Option
                   </div>
                 </div>
                 
                 <div className="w-20 h-28 flex-shrink-0 md:w-16 md:h-24">
                   <img 
                     src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png"
-                    alt="Abundance Report"
+                    alt="Mini Horoscope"
                     className="w-full h-full object-cover rounded-lg shadow-lg"
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -73,113 +220,169 @@ const SubscriptionComponent = () => {
                     }}
                   />
                   <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Abundance<br/>Report</span>
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Mini<br/>₹1</span>
                   </div>
                 </div>
               </div>
               
               <button 
-                onClick={() => handleOfferSelect('abundance')}
-                className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-4 rounded-xl mt-3 transition-all duration-200 flex items-center justify-center md:py-2 md:text-sm"
+                onClick={() => handleOfferSelect('mini')}
+                disabled={loading || !isProfileComplete()}
+                className={getButtonClass('mini')}
               >
-                Get This Report
-                <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                {loading && selectedOffer === 'mini' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {language === 'hindi' ? 'मिनी राशिफल प्राप्त करें' : 'Get Mini Horoscope'}
+                    <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </>
+                )}
               </button>
             </div>
 
-            {/* Your Premium Kundli Report */}
+            {/* Basic Horoscope - ₹5 */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-4 border border-blue-200">
               <div className="flex items-start space-x-4 md:space-x-3">
                 <div className="flex-1">
-                  <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">Your Premium Kundli Report</h2>
+                  <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">{language === 'hindi' ? 'बेसिक राशिफल' : 'Basic Horoscope'}</h2>
                   
                   <p className="text-sm text-gray-700 mb-2 md:text-xs">
-                    Our principal astrologer <span className="font-semibold">Pt. Rishiraj Tiwari Ji</span> has prepared 
-                    <span className="font-semibold"> The Premium Kundli Report</span> specifically for you. This in-depth 
-                    <span className="font-semibold text-blue-600"> 165+ page report</span> provides detailed predictions about your life and future, plus guidance on remedies and steps to take.
+                    {language === 'hindi' ? (
+                      <>
+                        व्यापक और किफायती ज्योतिषीय रिपोर्ट जिसमें 
+                        <span className="font-semibold text-blue-600"> साप्ताहिक भविष्यवाणियाँ</span>,
+                        <span className="font-semibold text-green-600"> ग्रह स्थितियाँ</span> और 
+                        <span className="font-semibold text-purple-600"> सामान्य उपाय</span> शामिल हैं।
+                      </>
+                    ) : (
+                      <>
+                        A comprehensive yet affordable astrological report covering your 
+                        <span className="font-semibold text-blue-600"> weekly predictions</span>, 
+                        <span className="font-semibold text-green-600"> planetary positions</span>, and 
+                        <span className="font-semibold text-purple-600"> basic remedies</span> for better living.
+                      </>
+                    )}
                   </p>
                   
                   <div className="bg-blue-400 text-white px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                    Get this report for ₹1500 ₹650
+                    {language === 'hindi' ? 'सिर्फ ₹5 प्रति PDF' : 'Only ₹5 Per PDF'}
                   </div>
                   <div className="text-xs text-gray-600 md:text-[10px]">
-                    (Save ₹850 - 57% OFF )
+                    Great Value for Money
                   </div>
                 </div>
                 
                 <div className="w-20 h-28 flex-shrink-0 md:w-16 md:h-24">
                   <img 
                     src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/Kundli.png"
-                    alt="Premium Kundli Report"
+                    alt="Basic Horoscope"
                     className="w-full h-full object-cover rounded-lg shadow-lg"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }}
                   />
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Premium<br/>Kundli</span>
+                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg shadow-lg hidden flex items-center justify-center">
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Basic<br/>₹5</span>
                   </div>
                 </div>
               </div>
               
               <button 
-                onClick={() => handleOfferSelect('premium')}
-                className="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl mt-3 transition-all duration-200 flex items-center justify-center md:py-2 md:text-sm"
+                onClick={() => handleOfferSelect('basic')}
+                disabled={loading || !isProfileComplete()}
+                className={getButtonClass('basic')}
               >
-                Get This Report
-                <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                {loading && selectedOffer === 'basic' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {language === 'hindi' ? 'बेसिक राशिफल प्राप्त करें' : 'Get Basic Horoscope'}
+                    <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </>
+                )}
               </button>
             </div>
 
-            {/* Exclusive Best Combo Offer */}
-            <div className="bg-gradient-to-r from-pink-50 to-red-50 rounded-2xl p-4 mb-4 border border-pink-200">
-              <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">Exclusive Best Combo Offer for You</h2>
+            {/* Professional Horoscope - ₹50 */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-4 border border-purple-200">
+              <h2 className="text-lg font-bold text-gray-800 mb-3 md:text-base">{language === 'hindi' ? 'प्रोफेशनल राशिफल' : 'Professional Horoscope'}</h2>
               
               <div className="flex items-start space-x-4 mb-4 md:space-x-3 md:mb-3">
                 <div className="flex-1">
                   <p className="text-sm text-gray-700 mb-3 md:text-xs md:mb-2">
-                    We've put together a special Best Combo Offer designed just for you. This offer includes both the 
-                    <span className="font-semibold"> Your Abundance Report</span>, which provides predictions for the coming year, and the 
-                    <span className="font-semibold"> Premium Kundli Report</span>, offering in-depth insights into your future.
+                    {language === 'hindi' ? (
+                      <>
+                        हमारी सबसे विस्तृत ज्योतिषीय विश्लेषण जिसमें 
+                        <span className="font-semibold text-purple-600"> मासिक भविष्यवाणियाँ</span>, 
+                        <span className="font-semibold text-blue-600"> करियर मार्गदर्शन</span>, 
+                        <span className="font-semibold text-green-600"> संबंधों की समझ</span> और 
+                        <span className="font-semibold text-red-600"> व्यक्तिगत उपाय</span> शामिल हैं।
+                      </>
+                    ) : (
+                      <>
+                        Our most detailed astrological analysis including 
+                        <span className="font-semibold text-purple-600"> monthly predictions</span>, 
+                        <span className="font-semibold text-blue-600"> career guidance</span>, 
+                        <span className="font-semibold text-green-600"> relationship insights</span>, and 
+                        <span className="font-semibold text-red-600"> personalized remedies</span>.
+                      </>
+                    )}
                   </p>
                 </div>
                 
                 <div className="w-20 h-28 flex-shrink-0 md:w-16 md:h-24">
                   <img 
                     src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_combo.png"
-                    alt="Combo Offer"
+                    alt="Professional Horoscope"
                     className="w-full h-full object-cover rounded-lg shadow-lg"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }}
                   />
-                  <div className="w-full h-full bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Combo<br/>Offer</span>
+                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg hidden flex items-center justify-center">
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Pro<br/>₹50</span>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-pink-300 text-pink-900 px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                Get this combo for ₹2499 ₹999
+              <div className="bg-purple-400 text-white px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
+                {language === 'hindi' ? 'सिर्फ ₹50 प्रति PDF' : 'Only ₹50 Per PDF'}
               </div>
               <div className="text-xs text-gray-600 mb-4 md:text-[10px] md:mb-3">
-                (Save ₹1500 - 60% OFF )
+                Complete Professional Analysis
               </div>
               
               <button 
-                onClick={() => handleOfferSelect('combo')}
-                className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center md:py-2 md:text-sm"
+                onClick={() => handleOfferSelect('professional')}
+                disabled={loading || !isProfileComplete()}
+                className={getButtonClass('professional')}
               >
-                Get This Combo
-                <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                {loading && selectedOffer === 'professional' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {language === 'hindi' ? 'प्रोफेशनल रिपोर्ट प्राप्त करें' : 'Get Professional Report'}
+                    <svg className="w-5 h-5 ml-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </>
+                )}
               </button>
             </div>
 
@@ -196,8 +399,6 @@ const SubscriptionComponent = () => {
             {/* Bottom padding for scrolling */}
             <div className="h-4"></div>
           </div>
-
-       
         </div>
       </div>
     </div>

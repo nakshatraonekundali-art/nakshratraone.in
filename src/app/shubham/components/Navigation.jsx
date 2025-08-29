@@ -23,10 +23,11 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
       // Initial form pages
       'form': { next: '/shubham/form/birthplace', back: null },
       'birthplace': { next: '/shubham/overreview', back: '/shubham/form' },
-      'overreview': { next: '/shubham/planets', back: '/shubham/form/birthplace' },
-      
+      'overreview': { next: '/shubham/horoscope/ghatchakra', back: '/shubham/form/birthplace' },
+
       // Planets section
-      'planets': { next: '/shubham/planets/sun', back: '/shubham/overreview' },
+      'ghatchakra': { next: '/shubham/planets', back: '/shubham/overreview' },
+      'planets': { next: '/shubham/planets/sun', back: '/shubham/horoscope/ghatchakra' },
       'planets/sun': { next: '/shubham/planets/moon', back: '/shubham/planets' },
       'planets/moon': { next: '/shubham/planets/mars', back: '/shubham/planets/sun' },
       'planets/mars': { next: '/shubham/planets/mercurey', back: '/shubham/planets/moon' },
@@ -45,10 +46,9 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
       'nakshatra': { next: '/shubham/nakshatra/ascendant', back: '/shubham/rashi' },
       'ascendant': { next: '/shubham/nakshatra/gem_suggestion', back: '/shubham/nakshatra' },
       'gem_suggestion': { next: '/shubham/nakshatra/numero', back: '/shubham/nakshatra/ascendant' },
-      'numero': { next: '/shubham/horoscope', back: '/shubham/gem_suggestion' },
-      'horoscope': { next: '/shubham/horoscope/ghatchakra', back: '/shubham/numero' },
-      'ghatchakra': { next: '/shubham/subscription', back: '/shubham/horoscope' },
-      'subscription': { next: null, back: '/shubham/ghatchakra' },
+      'numero': { next: '/shubham/subscription', back: '/shubham/gem_suggestion' },
+      // 'horoscope': { next: '/shubham/horoscope/ghatchakra', back: '/shubham/numero' },
+      'subscription': { next: null, back: '/shubham/numero' },
       
       // Remove old entries that are no longer needed
       'kalsarpa_details': { next: '/shubham/manglikdosh', back: '/shubham/horoscope' },
@@ -103,15 +103,8 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
       {!showBack && <div></div>}
 
       {showNext && (
-        navConfig.next ? (
-          <Link
-            href={navConfig.next}
-            className={`bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm ${disableNext ? 'opacity-50 pointer-events-none' : ''}`}
-            aria-disabled={disableNext}
-          >
-            {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
-          </Link>
-        ) : (
+        // Only call onNext handler (save user) on birthplace page, otherwise use normal navigation
+        (onNext && currentPage === 'birthplace') ? (
           <button
             onClick={handleNext}
             disabled={disableNext}
@@ -120,6 +113,25 @@ const Navigation = ({ currentPage, onNext, onBack, nextText = "Next →", backTe
           >
             {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
           </button>
+        ) : (
+          navConfig.next ? (
+            <Link
+              href={navConfig.next}
+              className={`bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm ${disableNext ? 'opacity-50 pointer-events-none' : ''}`}
+              aria-disabled={disableNext}
+            >
+              {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
+            </Link>
+          ) : (
+            <button
+              onClick={handleNext}
+              disabled={disableNext}
+              className={`bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm ${disableNext ? 'opacity-50' : ''}`}
+              aria-disabled={disableNext}
+            >
+              {nextText === "Next →" ? (language === 'english' ? translations.next.english : translations.next.hindi) : nextText}
+            </button>
+          )
         )
       )}
     </div>

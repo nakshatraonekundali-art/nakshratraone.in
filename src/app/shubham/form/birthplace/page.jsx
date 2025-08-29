@@ -459,6 +459,7 @@ const BirthPlace = () => {
         city,
         country
       };
+      console.log('[Birthplace] Submitting form data to /api/kundli/save-form-data:', submitData);
       
       // Call API to save form data
       const response = await fetch('/api/kundli/save-form-data', {
@@ -468,19 +469,19 @@ const BirthPlace = () => {
         },
         body: JSON.stringify(submitData),
       });
-      
+      console.log('[Birthplace] Save API response status:', response.status, response.statusText);
       const result = await response.json();
-      
+      console.log('[Birthplace] Save API response JSON:', result);
       if (!response.ok) {
         throw new Error(result.message || 'Failed to save form data');
       }
       
-      console.log('Form data saved successfully:', result);
+      console.log('[Birthplace] Form data saved successfully. New user id:', result?.user?.id, 'analysisId:', result?.analysisId);
       
       // Navigate to overview page
       router.push('/shubham/overreview');
     } catch (err) {
-      console.error('Error submitting form:', err);
+      console.error('[Birthplace] Error submitting form:', err);
       setError(err.message || 'An error occurred while saving your data');
     } finally {
       setSubmitting(false);
@@ -603,10 +604,14 @@ const BirthPlace = () => {
           <div className="pt-32">
             <Navigation 
               currentPage="birthplace" 
-              nextText={language === 'english' ? translations.next.english : translations.next.hindi}
+              nextText={submitting ? 
+                (language === 'english' ? 'Saving...' : 'सहेज रहा है...') : 
+                (language === 'english' ? translations.next.english : translations.next.hindi)
+              }
               backText={language === 'english' ? translations.back.english : translations.back.hindi}
-              onNext={() => window.location.href = "/shubham/overreview"}
-              onBack={() => window.location.href = "/shubham/form"}
+              onNext={handleSubmit}
+              disableNext={submitting}
+              onBack={() => router.push('/shubham/form')}
             />
           </div>
         </div>
@@ -705,7 +710,7 @@ const BirthPlace = () => {
               }
               backText={language === 'english' ? translations.back.english : translations.back.hindi}
               onNext={handleSubmit}
-              onBack={() => window.location.href = "/shubham/form"}
+              onBack={() => router.push('/shubham/form')}
               disableNext={submitting}
             />
           </div>

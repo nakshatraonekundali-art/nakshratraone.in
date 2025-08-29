@@ -27,19 +27,31 @@ export const KundliProvider = ({ children }) => {
     return 'english';
   });
 
-  const [formData, setFormData] = useState({
-    name: '',
-    gender: 'Male',
-    month: 'MM',
-    day: 'DD',
-    year: 'YYYY',
-    hour: 'HH',
-    min: 'MM',
-    country: 'India',
-    city: '',
-    latitude: 28.6139, // Default to Delhi
-    longitude: 77.2090,
-    timezone: 5.5
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('kundli-form');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (_) {}
+    }
+    return {
+      name: '',
+      gender: 'Male',
+      month: 'MM',
+      day: 'DD',
+      year: 'YYYY',
+      hour: 'HH',
+      min: 'MM',
+      country: 'India',
+      city: '',
+      mobile: '',
+      email: '',
+      latitude: 28.6139, // Default to Delhi
+      longitude: 77.2090,
+      timezone: 5.5
+    };
   });
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -58,9 +70,23 @@ export const KundliProvider = ({ children }) => {
     setFormData(prev => {
       const updated = { ...prev, ...newData };
       console.log('Form data updated to:', updated);
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kundli-form', JSON.stringify(updated));
+        }
+      } catch (_) {}
       return updated;
     });
   };
+
+  // Keep form data synced to localStorage on mount changes (for external updates)
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kundli-form', JSON.stringify(formData));
+      }
+    } catch (_) {}
+  }, [formData]);
 
   const nextStep = () => {
     setCurrentStep(prev => prev + 1);

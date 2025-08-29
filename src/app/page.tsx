@@ -179,9 +179,9 @@ const HomeScreen = () => {
                   </div>
                 </div>
 
-                <Link href="/admin/login">
+                <Link href="/admin">
                   <button className="w-full flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-blue-400 to-purple-500 text-white rounded-2xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-lg group">
-                    <span>Admin Login</span>
+                    <span>Admin </span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </Link>

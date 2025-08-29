@@ -19,7 +19,8 @@ export async function GET(req) {
       whereClause.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { birthCity: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { email: { contains: search, mode: 'insensitive' } },
+        { mobile: { contains: search, mode: 'insensitive' } }
       ];
     }
 
@@ -61,6 +62,7 @@ export async function GET(req) {
       birthCity: user.birthCity,
       birthCountry: user.birthCountry,
       email: user.email,
+      mobile: user.mobile,
       hasPlan: user.userPlans.length > 0,
       currentPlan: user.userPlans.length > 0 ? user.userPlans[0].plan : null,
       planStartDate: user.userPlans.length > 0 ? user.userPlans[0].startDate : null,

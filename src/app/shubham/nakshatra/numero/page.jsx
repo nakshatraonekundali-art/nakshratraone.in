@@ -349,7 +349,7 @@ const NumeroDetails = () => {
                     {language === 'english' ? translations.title.english : translations.title.hindi} {numeroData.name}
                   </h1>
                   <p className="text-sm text-gray-600">
-                    {language === 'english' ? translations.bornOn.english : translations.bornOn.hindi} {numeroData.date}
+                    {/* {language === 'english' ? translations.bornOn.english : translations.bornOn.hindi} {numeroData.date} */}
                   </p>
                 </div>
 
