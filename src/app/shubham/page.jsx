@@ -14,7 +14,7 @@ const Select_Language = () => {
       console.log('Navigating to form with language:', language);
     }, 100);
   };
-  
+  // ddhd
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
