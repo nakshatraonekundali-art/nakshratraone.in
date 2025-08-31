@@ -127,6 +127,30 @@ const HomeScreen = () => {
 
       {/* Mobile Layout - Stack vertically */}
       <div className="block lg:hidden px-4 pb-4 space-y-4">
+        {/* Rishi Image Section - Mobile */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 text-center">
+            <h2 className="text-xl font-bold mb-2">ANALYZE YOUR KUNDLI</h2>
+            <h3 className="text-lg font-semibold">IN-DEPTH FOR FREE</h3>
+          </div>
+          
+          <div className="p-4 text-center">
+           
+
+            <Link href="/kundali">
+              <img 
+                src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/Analyser.png"
+                alt="Spiritual Guru"
+                className="w-full max-w-xs mx-auto h-64 object-contain rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300 mb-4"
+              />
+            </Link>
+            <Link href="/kundali">
+              <button className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 px-6 rounded-full text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200">
+                Analyze for Free Now
+              </button>
+            </Link>
+          </div>
+        </div>
         {/* Panchang Card - Mobile First */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Panchang Header */}
@@ -251,30 +275,7 @@ const HomeScreen = () => {
           </div>
         </div>
 
-        {/* Rishi Image Section - Mobile */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 text-center">
-            <h2 className="text-xl font-bold mb-2">ANALYZE YOUR KUNDLI</h2>
-            <h3 className="text-lg font-semibold">IN-DEPTH FOR FREE</h3>
-          </div>
-          
-          <div className="p-4 text-center">
-           
-
-            <Link href="/shubham">
-              <img 
-                src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/Analyser.png"
-                alt="Spiritual Guru"
-                className="w-full max-w-xs mx-auto h-64 object-contain rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300 mb-4"
-              />
-            </Link>
-            <Link href="/shubham">
-              <button className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 px-6 rounded-full text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200">
-                Analyze for Free Now
-              </button>
-            </Link>
-          </div>
-        </div>
+        
       </div>
 
       {/* Desktop Layout - Side by side */}
@@ -283,14 +284,14 @@ const HomeScreen = () => {
         <div className="flex-1 bg-white rounded-3xl p-8 shadow-lg flex flex-col justify-center items-center">
         
 
-          <Link href="/shubham">
+          <Link href="/kundali">
             <img 
               src="https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/Analyser.png"
               alt="Spiritual Guru"
               className="h-[80vh] object-contain rounded-2xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300 mb-6"
             />
           </Link>
-          <Link href="/shubham">
+          <Link href="/kundali">
             <button className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-4 px-8 rounded-full text-xl hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200">
               Analyze for Free Now
             </button>

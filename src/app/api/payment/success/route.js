@@ -164,7 +164,7 @@ export async function POST(request) {
               }
               setTimeout(function(){ window.open(pdf, '_blank'); }, 300);
             }
-            setTimeout(function(){ window.location = '/shubham?payment=success'; }, 5000);
+            setTimeout(function(){ window.location = '/kundali?payment=success'; }, 5000);
           })();
         </script>
       </body></html>`;
