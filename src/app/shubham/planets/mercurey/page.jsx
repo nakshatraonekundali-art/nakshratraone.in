@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
 import { useKundli } from '../../context/KundliContext';
+import Link from 'next/link';
 
 const MercuryAnalysis = () => {
   const [mercuryData, setMercuryData] = useState(null);
@@ -291,9 +292,10 @@ const MercuryAnalysis = () => {
 
             {/* Wealth Map Section - Mercury themed */}
             <div className="bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl p-4 border border-gray-200 mb-6">
-              <div className="mb-4 md:mb-3">
+              <div className="mb-4 md:mb-3 cursor-pointer">
                 <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-purple-600 md:text-xs">
-                  {language === 'hindi' ? 'आपके लिए व्यक्तिगत संपत्ति मानचित्र!' : 'PERSONALIZED WEALTH MAP FOR YOU!'}
+                    <Link href="/shubham/subscription">{language === 'hindi' ? 'आपके लिए व्यक्तिगत संपत्ति मानचित्र!' : 'PERSONALIZED WEALTH MAP FOR YOU!'}</Link>
+                
                 </button>
               </div>
               
@@ -312,10 +314,8 @@ const MercuryAnalysis = () => {
                     }
                   </p>
                 </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {language === 'hindi' ? 'आपका प्रचुरता मानचित्र' : 'YOUR ABUNDANCE MAP'}
-                  </div>
+                <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
                 </div>
               </div>
             </div>

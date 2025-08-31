@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
 import { useKundli } from '../../context/KundliContext';
+import Link from 'next/link';
 
 const JupiterAnalysis = () => {
   const [jupiterData, setJupiterData] = useState(null);
@@ -295,6 +296,36 @@ const JupiterAnalysis = () => {
                 </p>
               </div>
             )}
+
+           {/* Wealth Map Section - Mercury themed */}
+            <div className="bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl p-4 border border-gray-200 mb-6">
+              <div className="mb-4 md:mb-3 cursor-pointer">
+                <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-purple-600 md:text-xs">
+                    <Link href="/shubham/subscription">{language === 'hindi' ? 'आपके लिए व्यक्तिगत संपत्ति मानचित्र!' : 'PERSONALIZED WEALTH MAP FOR YOU!'}</Link>
+                
+                </button>
+              </div>
+              
+              <div className="flex items-start space-x-4 md:space-x-3">
+                <div className="flex-1">
+                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
+                    {language === 'hindi' 
+                      ? "व्यक्तिगत वास्तु अंतर्दृष्टि के साथ अपने घर की छुपी हुई समृद्धि को अनलॉक करें। शक्तिशाली धन-आकर्षक क्षेत्रों और सरल उपायों की खोज करें।"
+                      : "Unlock your home's hidden prosperity with personalized Vastu insights. Discover powerful money-attracting zones and simple remedies."
+                    }
+                  </p>
+                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
+                    {language === 'hindi' 
+                      ? "लक्षित धन सक्रियण रणनीतियां, रंग सिफारिशें, और आपके स्थान के लिए विशेष रूप से डिज़ाइन किए गए प्लेसमेंट टिप्स प्राप्त करें।"
+                      : "Get targeted wealth activation strategies, color recommendations, and placement tips designed specifically for your space."
+                    }
+                  </p>
+                </div>
+                <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
+                </div>
+              </div>
+            </div>
 
             {/* Bottom padding for scrolling */}
             <div className="h-4"></div>

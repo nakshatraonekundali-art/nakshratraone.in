@@ -20,9 +20,27 @@ const SubscriptionComponent = () => {
   };
 
   const plans = {
-    mini: { name: 'Mini Horoscope', price: 1, color: 'yellow' },
-    basic: { name: 'Basic Horoscope', price: 5, color: 'blue' },
-    professional: { name: 'Professional Horoscope', price: 50, color: 'purple' }
+    mini: { 
+      name: 'Mini Horoscope', 
+      originalPrice: 1499, 
+      offerPrice: 899, 
+      discount: 40,
+      color: 'yellow' 
+    },
+    basic: { 
+      name: 'Basic Horoscope', 
+      originalPrice: 1999, 
+      offerPrice: 1499, 
+      discount: 56.67,
+      color: 'blue' 
+    },
+    professional: { 
+      name: 'Professional Horoscope', 
+      originalPrice: 2499, 
+      offerPrice: 1999, 
+      discount: 60,
+      color: 'purple' 
+    }
   };
 
   const handleOfferSelect = async (planType) => {
@@ -70,7 +88,7 @@ const SubscriptionComponent = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: plan.price,
+          amount: plan.offerPrice,
           planType: planType,
           userData: userData,
           txnid: txnid
@@ -201,9 +219,12 @@ const SubscriptionComponent = () => {
                     )}
                   </p>
                   
-                  <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                    {language === 'hindi' ? 'सिर्फ ₹1 प्रति PDF' : 'Only ₹1 Per PDF'}
+                  <div className="flex items-center space-x-3 mb-3">
+                    <span className="text-gray-500 line-through text-sm">₹{plans.mini.originalPrice}</span>
+                    <span className="text-gray-800 font-bold text-lg">₹{plans.mini.offerPrice}</span>
+                    <span className="text-green-600 text-sm font-medium">({plans.mini.discount}% OFF)</span>
                   </div>
+                  
                   <div className="text-xs text-gray-600 md:text-[10px]">
                     Most Affordable Option
                   </div>
@@ -220,7 +241,7 @@ const SubscriptionComponent = () => {
                     }}
                   />
                   <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Mini<br/>₹1</span>
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Mini<br/>₹{plans.mini.offerPrice}</span>
                   </div>
                 </div>
               </div>
@@ -270,9 +291,12 @@ const SubscriptionComponent = () => {
                     )}
                   </p>
                   
-                  <div className="bg-blue-400 text-white px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                    {language === 'hindi' ? 'सिर्फ ₹5 प्रति PDF' : 'Only ₹5 Per PDF'}
+                  <div className="flex items-center space-x-3 mb-3">
+                    <span className="text-gray-500 line-through text-sm">₹{plans.basic.originalPrice}</span>
+                    <span className="text-gray-800 font-bold text-lg">₹{plans.basic.offerPrice}</span>
+                    <span className="text-green-600 text-sm font-medium">({plans.basic.discount}% OFF)</span>
                   </div>
+                  
                   <div className="text-xs text-gray-600 md:text-[10px]">
                     Great Value for Money
                   </div>
@@ -289,7 +313,7 @@ const SubscriptionComponent = () => {
                     }}
                   />
                   <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Basic<br/>₹5</span>
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Basic<br/>₹{plans.basic.offerPrice}</span>
                   </div>
                 </div>
               </div>
@@ -340,6 +364,12 @@ const SubscriptionComponent = () => {
                       </>
                     )}
                   </p>
+                  
+                  <div className="flex items-center space-x-3 mb-3">
+                    <span className="text-gray-500 line-through text-sm">₹{plans.professional.originalPrice}</span>
+                    <span className="text-gray-800 font-bold text-lg">₹{plans.professional.offerPrice}</span>
+                    <span className="text-green-600 text-sm font-medium">({plans.professional.discount}% OFF)</span>
+                  </div>
                 </div>
                 
                 <div className="w-20 h-28 flex-shrink-0 md:w-16 md:h-24">
@@ -353,14 +383,11 @@ const SubscriptionComponent = () => {
                     }}
                   />
                   <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg hidden flex items-center justify-center">
-                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Pro<br/>₹50</span>
+                    <span className="text-white text-xs font-bold text-center px-2 md:text-[10px]">Pro<br/>₹{plans.professional.offerPrice}</span>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-purple-400 text-white px-4 py-2 rounded-lg font-bold text-sm mb-2 inline-block md:px-3 md:py-1 md:text-xs">
-                {language === 'hindi' ? 'सिर्फ ₹50 प्रति PDF' : 'Only ₹50 Per PDF'}
-              </div>
               <div className="text-xs text-gray-600 mb-4 md:text-[10px] md:mb-3">
                 Complete Professional Analysis
               </div>

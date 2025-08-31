@@ -39,6 +39,8 @@ export async function POST(request) {
       // Generate the PDF server-side
       let pdfUrl = '';
       let pdfError = '';
+      let emailSent = false;
+      let emailError = '';
       
       // Debug logging
       console.log('Payment success - decoded data:', {
@@ -78,6 +80,40 @@ export async function POST(request) {
         
         if (json.success && json.pdf_url) {
           pdfUrl = json.pdf_url;
+          
+          // Send email with PDF if user email is available
+          if (decoded.userData.email) {
+            try {
+              console.log('Sending email to:', decoded.userData.email);
+              
+              const emailResponse = await fetch(`${baseUrl}/api/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  to: decoded.userData.email,
+                  subject: `Your Kundli Report - ${decoded.userData.name || 'User'}`,
+                  pdfUrl: pdfUrl,
+                  pdfName: `kundli-report-${decoded.userData.name || 'user'}.pdf`,
+                  userName: decoded.userData.name || 'User'
+                })
+              });
+              
+              const emailResult = await emailResponse.json();
+              
+              if (emailResult.success) {
+                emailSent = true;
+                console.log('Email sent successfully:', emailResult.messageId);
+              } else {
+                emailError = emailResult.message;
+                console.error('Email sending failed:', emailError);
+              }
+            } catch (emailErr) {
+              emailError = emailErr.message;
+              console.error('Email sending error:', emailErr);
+            }
+          } else {
+            console.log('No email address available for sending report');
+          }
         } else {
           pdfError = json.message || 'PDF generation failed';
         }
@@ -86,13 +122,22 @@ export async function POST(request) {
         pdfError = e.message;
       }
 
-      // Return an HTML page that triggers a download/open and then redirects
+      // Return an HTML page that shows email status and triggers download
       const html = `<!doctype html><html><head><meta charset="utf-8"><title>Payment Success</title></head><body style="font-family:system-ui;-webkit-font-smoothing:antialiased;">
         <div style="max-width:640px;margin:80px auto;text-align:center;">
           <h1>Payment Successful</h1>
           <p>Transaction ID: ${txnid || ''}</p>
           ${pdfUrl ? 
-            `<p>Your report is ready. Download should begin automatically. <a href="${pdfUrl}" target="_blank">Open PDF</a></p>` : 
+            `<div style="margin: 20px 0;">
+              <p>Your report is ready!</p>
+              ${emailSent ? 
+                `<p style="color: green; font-weight: bold;">✓ Report sent to your email: ${decoded.userData?.email || ''}</p>` :
+                decoded.userData?.email ? 
+                  `<p style="color: orange;">⚠ Email delivery failed: ${emailError}</p>` :
+                  `<p style="color: orange;">⚠ No email address provided</p>`
+              }
+              <p><a href="${pdfUrl}" target="_blank" style="background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 10px;">Download PDF</a></p>
+            </div>` : 
             pdfError ? 
               `<p style="color: red;">PDF generation failed: ${pdfError}</p><p>Please contact support with Transaction ID: ${txnid}</p>` :
               `<p>Your report is being prepared. Please wait...</p>`
@@ -101,8 +146,9 @@ export async function POST(request) {
             <strong>Debug Info:</strong><br>
             Plan Type: ${decoded.planType || productinfo}<br>
             Has User Data: ${decoded.userData ? 'Yes' : 'No'}<br>
-            ${decoded.userData ? `User Name: ${decoded.userData.name || 'N/A'}<br>` : ''}
-            ${pdfError ? `Error: ${pdfError}` : ''}
+            ${decoded.userData ? `User Name: ${decoded.userData.name || 'N/A'}<br>User Email: ${decoded.userData.email || 'N/A'}<br>` : ''}
+            ${pdfError ? `PDF Error: ${pdfError}<br>` : ''}
+            ${emailError ? `Email Error: ${emailError}<br>` : ''}
           </div>
         </div>
         <script>
@@ -118,7 +164,7 @@ export async function POST(request) {
               }
               setTimeout(function(){ window.open(pdf, '_blank'); }, 300);
             }
-            setTimeout(function(){ window.location = '/shubham?payment=success'; }, 3000);
+            setTimeout(function(){ window.location = '/shubham?payment=success'; }, 5000);
           })();
         </script>
       </body></html>`;

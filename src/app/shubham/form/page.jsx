@@ -113,10 +113,11 @@ const Form = () => {
             <div>
               <input
                 type="email"
-                placeholder={language === 'english' ? 'Email (optional)' : 'ईमेल (वैकल्पिक)'}
+                placeholder={language === 'english' ? 'Email *' : 'ईमेल *'}
                 value={formData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+                required
               />
             </div>
           </div>
@@ -255,10 +256,11 @@ const Form = () => {
             <div>
               <input
                 type="email"
-                placeholder={language === 'english' ? 'Email (optional)' : 'ईमेल (वैकल्पिक)'}
+                placeholder={language === 'english' ? 'Email *' : 'ईमेल *'}
                 value={formData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+                required
               />
             </div>
           </div>

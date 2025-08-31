@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useKundli } from '../../context/KundliContext';
 import Navigation from '../../components/Navigation';
+import Link from 'next/link';
 
 const Moon = () => {
   const [moonData, setMoonData] = useState(null);
@@ -292,8 +293,9 @@ const Moon = () => {
             {/* Kundli Breakdown Section - Updated like other components */}
             <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 border border-orange-200 mb-6">
               <div className="mb-4 md:mb-3">
-                <button className="bg-gradient-to-r from-blue-400 to-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-blue-500 md:text-xs">
-                  {translations.personalizedMap}
+                <button className="bg-gradient-to-r cursor-pointer from-blue-400 to-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-blue-500 md:text-xs">
+                   <Link href="/shubham/subscription">{translations.personalizedMap}</Link>
+                
                 </button>
               </div>
               
@@ -317,10 +319,8 @@ const Moon = () => {
                     </span>
                   </div>
                 </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-purple-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {translations.kundliReport}
-                  </div>
+                <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
                 </div>
               </div>
             </div>

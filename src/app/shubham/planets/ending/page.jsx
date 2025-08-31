@@ -152,30 +152,7 @@ const PlanetsEndingScreen = () => {
               </div>
             </div>
 
-            {/* Next Section Preview */}
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border border-red-200 mb-6">
-              <div className="mb-4 md:mb-3">
-                <button className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-red-600 md:text-xs">
-                  {language === 'hindi' ? 'अगला: कालसर्प योग' : 'NEXT: KALSARPA ANALYSIS'}
-                </button>
-              </div>
-              
-              <div className="flex items-start space-x-4 md:space-x-3">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
-                    {language === 'hindi' 
-                      ? "कालसर्प योग आपकी कुंडली में राहु और केतु की स्थिति के आधार पर विशेष योग है जो आपके जीवन पर महत्वपूर्ण प्रभाव डालता है।"
-                      : "Kalsarpa Yoga is a special combination based on the position of Rahu and Ketu in your horoscope that significantly influences your life."
-                    }
-                  </p>
-                </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-red-600 to-orange-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {language === 'hindi' ? 'कालसर्प योग' : 'KALSARPA YOGA'}
-                  </div>
-                </div>
-              </div>
-            </div>
+         
 
             {/* Bottom padding for scrolling */}
             <div className="h-4"></div>

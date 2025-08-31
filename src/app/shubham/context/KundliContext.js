@@ -128,7 +128,8 @@ export const KundliProvider = ({ children }) => {
         formData.day === 'DD' || 
         formData.year === 'YYYY' || 
         formData.hour === 'HH' || 
-        formData.min === 'MM') {
+        formData.min === 'MM' ||
+        !formData.email) {
       console.log('getBirthDetails: Form data not complete, returning null');
       console.log('Missing fields:', {
         name: !formData.name,
@@ -136,7 +137,8 @@ export const KundliProvider = ({ children }) => {
         day: formData.day === 'DD',
         year: formData.year === 'YYYY',
         hour: formData.hour === 'HH',
-        min: formData.min === 'MM'
+        min: formData.min === 'MM',
+        email: !formData.email
       });
       return null;
     }

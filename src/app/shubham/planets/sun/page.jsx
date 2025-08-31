@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useKundli } from '../../context/KundliContext';
 import Navigation from '../../components/Navigation';
+import Link from 'next/link';
 
 const SunAnalysis = () => {
   const { formData, language, getBirthDetails } = useKundli();
@@ -278,7 +279,7 @@ const SunAnalysis = () => {
             <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200 mb-6">
               <div className="mb-4 md:mb-3">
                 <button className="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-orange-500 md:text-xs">
-                  {translations.tailoredPlan}
+                  <Link href="/shubham/subscription">{translations.tailoredPlan}</Link>
                 </button>
               </div>
               
@@ -297,10 +298,8 @@ const SunAnalysis = () => {
                     }
                   </p>
                 </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {translations.prosperityReport}
-                  </div>
+                <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
                 </div>
               </div>
             </div>

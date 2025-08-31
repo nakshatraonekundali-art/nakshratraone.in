@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
 import { useKundli } from '../../context/KundliContext';
+import Link from 'next/link';
 
 const RahuAnalysis = () => {
   const [rahuData, setRahuData] = useState(null);
@@ -291,7 +292,8 @@ const RahuAnalysis = () => {
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200 mb-6">
               <div className="mb-4 md:mb-3">
                 <button className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-pink-600 md:text-xs">
-                  {language === 'hindi' ? 'आपके लिए तैयार किया गया समृद्धि योजना!' : 'TAILORED ABUNDANCE PLAN FOR YOU!'}
+                      <Link href="/shubham/subscription">{language === 'hindi' ? 'आपके लिए तैयार किया गया समृद्धि योजना!' : 'TAILORED ABUNDANCE PLAN FOR YOU!'}</Link>
+                
                 </button>
               </div>
               
@@ -303,16 +305,10 @@ const RahuAnalysis = () => {
                       : "Get a bespoke Astro-Vastu blueprint that transforms your space into a magnet for wealth, health and positivity. Specific directions, colors, gemstones, and powerful Vedic mantras."
                     }
                   </p>
-                  <div className="mt-3">
-                    <button className="text-blue-600 text-sm font-semibold underline hover:text-blue-700 md:text-xs">
-                      {language === 'hindi' ? 'मेरा खाका अनलॉक करें →' : 'Unlock My Blueprint →'}
-                    </button>
-                  </div>
+                 
                 </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {language === 'hindi' ? 'आपका समृद्धि खाका' : 'YOUR ABUNDANCE BLUEPRINT'}
-                  </div>
+                <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
                 </div>
               </div>
             </div>

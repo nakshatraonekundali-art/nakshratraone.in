@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
 import { useKundli } from '../../context/KundliContext';
+import Link from 'next/link';
 
 const VenusAnalysis = () => {
   const [venusData, setVenusData] = useState(null);
@@ -292,7 +293,8 @@ const loadFallbackData = () => {
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200 mb-6">
               <div className="mb-4 md:mb-3">
                 <button className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-pink-600 md:text-xs">
-                  {language === 'hindi' ? 'आपके लिए वास्तु धन रहस्य!' : 'VASTU WEALTH SECRETS FOR YOU!'}
+                    <Link href="/shubham/subscription">{language === 'hindi' ? 'आपके लिए वास्तु धन रहस्य!' : 'VASTU WEALTH SECRETS FOR YOU!'}</Link>
+              
                 </button>
               </div>
               
@@ -310,16 +312,10 @@ const loadFallbackData = () => {
                       : "Unlock abundance zones in your home with precise directional guidance and remedial solutions."
                     }
                   </p>
-                  <div className="mt-3">
-                    <button className="text-purple-600 text-sm font-semibold underline hover:text-purple-700 md:text-xs">
-                      {language === 'hindi' ? 'मेरे रहस्य प्रकट करें →' : 'Reveal My Secrets →'}
-                    </button>
-                  </div>
+                 
                 </div>
-                <div className="w-20 h-24 bg-gradient-to-br from-purple-600 to-pink-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                  <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                    {language === 'hindi' ? 'आपकी समृद्धि रिपोर्ट' : 'YOUR ABUNDANCE REPORT'}
-                  </div>
+               <div className="w-20 h-24  rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
+                  <img src="	https://astro-vedicrishi-in.b-cdn.net/web-vedicrishi/images/kundli_analyser/abundance_report.png" alt="" />
                 </div>
               </div>
             </div>

@@ -706,37 +706,7 @@ const PanchangDetails = () => {
                   </div>
                 </div>
 
-                {/* Wealth Map Section - Panchang themed */}
-                <div className="bg-gradient-to-br from-gray-50 to-orange-50 rounded-xl p-4 border border-gray-200 mb-6">
-                  <div className="mb-4 md:mb-3">
-                    <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all border-2 border-orange-600 md:text-xs">
-                      {language === 'hindi' ? 'आपके लिए व्यक्तिगत पंचांग गाइड!' : 'PERSONALIZED PANCHANG GUIDE FOR YOU!'}
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-start space-x-4 md:space-x-3">
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
-                        {language === 'hindi' 
-                          ? "व्यक्तिगत ज्योतिष अंतर्दृष्टि के साथ अपने जीवन की छुपी हुई संभावनाओं को अनलॉक करें। शक्तिशाली मुहूर्त और सरल उपायों की खोज करें।"
-                          : "Unlock your life's hidden potential with personalized astrological insights. Discover powerful muhurtas and simple remedies."
-                        }
-                      </p>
-                      <p className="text-sm text-gray-700 mb-3 leading-relaxed md:text-xs md:mb-2">
-                        {language === 'hindi' 
-                          ? "लक्षित शुभ समय रणनीतियां, तिथि सिफारिशें, और आपके जीवन के लिए विशेष रूप से डिज़ाइन किए गए ज्योतिष टिप्स प्राप्त करें।"
-                          : "Get targeted auspicious timing strategies, tithi recommendations, and astrological tips designed specifically for your life."
-                        }
-                      </p>
-                    </div>
-                    <div className="w-20 h-24 bg-gradient-to-br from-orange-600 to-red-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 md:w-16 md:h-20">
-                      <div className="text-white text-xs font-bold text-center leading-tight px-2 md:text-[10px]">
-                        {language === 'hindi' ? 'आपका पंचांग गाइड' : 'YOUR PANCHANG GUIDE'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
+            
                 {/* Bottom padding for scrolling */}
                 <div className="h-4"></div>
               </>
