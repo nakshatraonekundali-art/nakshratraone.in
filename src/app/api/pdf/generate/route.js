@@ -91,7 +91,7 @@ export async function POST(request) {
       place: `${userData.city || 'Unknown'}, ${userData.country || 'India'}`,
       chart_style: "NORTH_INDIAN",
       footer_link: "https://nakshatraone.in",
-      logo_url: "/nak.png", // Fixed: Direct reference to public folder
+      logo_url: "https://cdn.shopify.com/s/files/1/0933/4082/7954/files/logo_new-removebg-preview.png?v=1757161162", // Fixed: Direct reference to public folder
       company_name: "NakshatraOne",
       company_info: "NakshatraOne is your trusted astrology and kundli solution platform providing accurate predictions and remedies.",
       domain_url: "https://nakshatraone.in",
