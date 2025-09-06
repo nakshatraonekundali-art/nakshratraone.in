@@ -23,7 +23,7 @@ const SubscriptionComponent = () => {
     mini: { 
       name: 'Mini Horoscope', 
       originalPrice: 1499, 
-      offerPrice: 1, 
+      offerPrice: 999, 
       discount: 40,
       color: 'yellow' 
     },
