@@ -41,14 +41,13 @@ export async function POST(request) {
       chart_style: "NORTH_INDIAN",
 
       // Branding / Company Details
-      footer_link: "https://nakshatraone.com",
-      logo_url: "https://nakshatraone.com/logo.png",
+      footer_link: "https://nakshatraone.in",
+      logo_url: "https://www.nakshatraone.com/cdn/shop/files/nakshatraone_logo_White.png?v=1746015984&width=360",
       company_name: "NakshatraOne",
       company_info: "NakshatraOne is your trusted astrology and kundli solution platform providing accurate predictions and remedies.",
-      domain_url: "https://nakshatraone.com",
-      company_email: "support@nakshatraone.com",
-      company_landline: "+91-22-1234-5678",
-      company_mobile: "+91-98765-43210"
+      domain_url: "https://nakshatraone.in",
+      company_email: "nakshatraonekundali@gmail.com",
+  
     };
 
     // Generate auth header
