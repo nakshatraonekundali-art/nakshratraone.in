@@ -68,48 +68,69 @@ export default function AdminUserPage() {
     }
   };
 
-  const downloadExcel = async () => {
+  // Fixed downloadExcel function
+  const downloadExcel = () => {
     try {
-      // Build query parameters for download
-      const params = new URLSearchParams();
-      if (filterType !== 'all') {
-        params.append('filterType', filterType);
-      }
-      if (filterType === 'custom') {
-        if (startDate) params.append('startDate', startDate);
-        if (endDate) params.append('endDate', endDate);
+      // Use the same filtered data that's displayed on screen
+      const dataToExport = filteredUsers.map(user => ({
+        Name: user.name || '',
+        Gender: user.gender || '',
+        'Birth Date': user.birthDate ? new Date(user.birthDate).toLocaleDateString() : '',
+        'Birth Time': user.birthTime || '',
+        'Birth Place': user.birthCity && user.birthCountry ? 
+          `${user.birthCity}, ${user.birthCountry}` : 
+          user.birthplace || '',
+        Mobile: user.mobile || '',
+        Email: user.email || '',
+        'Created At': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''
+      }));
+
+      if (dataToExport.length === 0) {
+        setError('No data to export');
+        return;
       }
 
-      const response = await fetch(`/api/admin/users/download?${params.toString()}`);
-      const data = await response.json();
+      // Create worksheet
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      
+      // Set column widths for better formatting
+      const columnWidths = [
+        { wch: 20 }, // Name
+        { wch: 10 }, // Gender
+        { wch: 12 }, // Birth Date
+        { wch: 12 }, // Birth Time
+        { wch: 25 }, // Birth Place
+        { wch: 15 }, // Mobile
+        { wch: 30 }, // Email
+        { wch: 12 }  // Created At
+      ];
+      worksheet['!cols'] = columnWidths;
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to download data');
-      }
-
-      // Create Excel file
-      const worksheet = XLSX.utils.json_to_sheet(data.users);
+      // Create workbook
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
 
-      // Generate filename based on filter
+      // Generate filename based on filter and search
       let filename = 'users';
-      if (data.filterType === 'today') {
-        filename = 'users_today';
-      } else if (data.filterType === 'week') {
-        filename = 'users_this_week';
-      } else if (data.filterType === 'month') {
-        filename = 'users_this_month';
-      } else if (data.filterType === 'quarter') {
-        filename = 'users_this_quarter';
-      } else if (data.filterType === 'custom') {
-        filename = `users_${data.startDate}_to_${data.endDate}`;
+      if (filterType !== 'all') {
+        filename += `_${filterType}`;
+      }
+      if (searchQuery.trim()) {
+        filename += '_filtered';
+      }
+      if (filterType === 'custom' && startDate && endDate) {
+        filename += `_${startDate}_to_${endDate}`;
       }
 
       // Download Excel file
       XLSX.writeFile(workbook, `${filename}.xlsx`);
+      
+      // Clear any previous errors
+      setError(null);
+      
     } catch (err) {
-      setError(err.message);
+      console.error('Export error:', err);
+      setError('Failed to export data to Excel');
     }
   };
 
@@ -127,7 +148,7 @@ export default function AdminUserPage() {
     return date.toLocaleDateString();
   };
 
-  // Filter users based on search query
+  // Filter users based on search query - this is the missing function
   const filteredUsers = users.filter(user =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -345,12 +366,13 @@ export default function AdminUserPage() {
               <div className={filterType === 'custom' ? 'lg:col-span-2' : 'lg:col-span-4'}>
                 <button
                   onClick={downloadExcel}
-                  className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 hover-lift"
+                  disabled={filteredUsers.length === 0}
+                  className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Download Excel
+                  Download Excel ({filteredUsers.length})
                 </button>
               </div>
             </div>
