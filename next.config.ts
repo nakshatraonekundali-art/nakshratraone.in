@@ -11,7 +11,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   // Exclude pages from prerendering to avoid issues with client-only features
-  unstable_excludePages: ["/admin/reset-password"],
+  unstable_excludePages: ["/admin/reset-password", "/admin/reset-password/"],
 };
 
 module.exports = nextConfig;

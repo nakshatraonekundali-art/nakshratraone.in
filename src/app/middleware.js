@@ -5,7 +5,9 @@ export function middleware(request) {
   const path = request.nextUrl.pathname;
 
   // Define protected routes that require admin authentication
-  const isAdminRoute = path.startsWith('/admin') && path !== '/admin/login';
+  const isAdminRoute = path.startsWith('/admin') && 
+    path !== '/admin/login' && 
+    !path.startsWith('/admin/reset-password');
 
   // Get the token from cookies
   const token = request.cookies.get('adminToken')?.value;
