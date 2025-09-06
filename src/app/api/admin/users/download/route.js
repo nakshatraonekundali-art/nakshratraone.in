@@ -72,10 +72,27 @@ export async function GET(request) {
       orderBy: { createdAt: 'desc' }
     });
     
-    return NextResponse.json({ success: true, users });
+    // Format data for Excel
+    const formattedData = users.map(user => ({
+      Name: user.name,
+      Gender: user.gender,
+      'Birth Date': user.birthDate ? new Date(user.birthDate).toLocaleDateString() : '',
+      'Birth Time': user.birthTime || '',
+      Birthplace: user.birthplace || '',
+      Mobile: user.mobile || '',
+      Email: user.email || '',
+      Created: user.createdAt ? new Date(user.createdAt).toLocaleString() : ''
+    }));
+    
+    // Return the formatted data for Excel download
+    return NextResponse.json({ 
+      success: true, 
+      users: formattedData,
+      filterType,
+      startDate: startDate ? new Date(startDate).toLocaleDateString() : null,
+      endDate: endDate ? new Date(endDate).toLocaleDateString() : null
+    });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
-
-
