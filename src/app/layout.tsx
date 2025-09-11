@@ -56,24 +56,16 @@ export default function RootLayout({
           `}
         </Script>
 
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1898471224300979&ev=PageView&noscript=1"
-          />
-        </noscript>
+        {/* Noscript fix */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `
+              <img height="1" width="1" style="display:none"
+              src="https://www.facebook.com/tr?id=1898471224300979&ev=PageView&noscript=1"/>
+            `,
+          }}
+        />
         {/* End Meta Pixel Script */}
-      </body>
-    </html>
-  );
-}
-
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
       </body>
     </html>
   );
