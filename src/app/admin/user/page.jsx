@@ -82,6 +82,7 @@ export default function AdminUserPage() {
           user.birthplace || '',
         Mobile: user.mobile || '',
         Email: user.email || '',
+        Time: user.time || '',
         'Created At': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''
       }));
 
