@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";   // ✅ Import yaha hona chahiye
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,19 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      import Script from "next/script";
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
 
-        {/* Meta Pixel Script */}
+        {/* ✅ Meta Pixel Script */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -56,7 +48,7 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Noscript fix */}
+        {/* ✅ Noscript fallback */}
         <noscript
           dangerouslySetInnerHTML={{
             __html: `
@@ -65,7 +57,6 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* End Meta Pixel Script */}
       </body>
     </html>
   );
